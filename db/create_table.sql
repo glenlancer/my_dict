@@ -12,7 +12,6 @@ create table Words (
 -- USAGE
 create table `Usage` (
 	UID     serial,
-	-- WID     bigint unsigned not null,
 	Word    varchar(50) not null unique,
 	`Usage` text not null,
 	primary key (UID),
@@ -30,7 +29,6 @@ create table Article (
 -- REFERENCE
 create table Reference (
 	RID serial,
-	-- WID bigint unsigned not null,
 	Word varchar(50) not null unique,
 	AID  bigint unsigned not null,
 	primary key (RID),
