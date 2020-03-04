@@ -12,7 +12,7 @@ create table Words (
 -- USAGE
 create table `Usage` (
 	UID     serial,
-	Word    varchar(50) not null unique,
+	Word    varchar(50) not null,
 	`Usage` text not null,
 	primary key (UID),
 	foreign key (Word) references Words(Word)
@@ -21,7 +21,7 @@ create table `Usage` (
 -- ARTICLE
 create table Article (
 	AID     serial,
-	Title   varchar(100) not null,
+	Title   varchar(100) not null unique,
 	Content text not null,
 	primary key (AID)
 ) ENGINE=InnoDB Default Charset=utf8;

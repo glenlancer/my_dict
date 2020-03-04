@@ -18,6 +18,23 @@ class DbOperator():
 		self.cursor.close()
 		self.conn.close()
 
+	def db_commit(self):
+		self.conn.commit()
+
+	def select_word(self, word):
+		sql = ''.join([
+			'select * from Words\n',
+		    f'Where Word = "{word}"'
+		])
+		try:
+			self.cursor.execute(sql)
+			return self.cursor.fetchone()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of {word} failed due to {e.args[-1]}'
+			)
+			return False		
+
 	def insert_word(self, word, meaning, pron):
 		sql = ''.join([
 			'INSERT INTO Words\n',
@@ -27,10 +44,23 @@ class DbOperator():
 		])
 		try:
 			self.cursor.execute(sql)
-			self.conn.commit()
 		except Exception as e:
 			self.messages.append(
 				f'Insertion of {word} failed due to {e.args[-1]}'
+			)
+			return False
+		return True
+
+	def update_word(self, word, meaning, pron):
+		sql = ''.join([
+			f'UPDATE Words SET Meaning="{meaning}", Pronunciation="{pron}", `date`=CURDATE()\n',
+			f'WHERE Word="{word}"'
+		])
+		try:
+			self.cursor.execute(sql)
+		except Exception as e:
+			self.messages.append(
+				f'Update of {word} failed due to {e.args[-1]}'
 			)
 			return False
 		return True
@@ -42,9 +72,9 @@ class DbOperator():
 		    'VALUES\n',
 		    f'("{word}", "{usage}")\n'
 		])
+		print('sql', sql)
 		try:
 			self.cursor.execute(sql)
-			self.conn.commit()
 		except Exception as e:
 			self.messages.append(
 				f'Insertion usage for {word} failed due to {e.args[-1]}'
@@ -56,7 +86,6 @@ class DbOperator():
 		sql = f'INSERT INTO Article (Content) VALUES ("{content}")'
 		try:
 			self.cursor.execute(sql)
-			self.conn.commit()
 		except Exception as e:
 			self.messages.append(
 				f'Insertion of article failed due to {e.args[-1]}'
@@ -65,6 +94,7 @@ class DbOperator():
 		return True
 
 	def print_messages(self):
+		print('here1')
 		print('--- All messages ---')
 		for message in self.messages:
 			print(message)
@@ -97,7 +127,8 @@ def db_access_revert(db_operator):
 	pass
 
 if __name__ == '__main__':
-	db_operator = DbOperator()
-	db_access_test(db_operator)
-	db_access_revert(db_operator)
-	db_operator.db_close()
+	# db_operator = DbOperator()
+	# db_access_test(db_operator)
+	# db_access_revert(db_operator)
+	# db_operator.db_close()
+	pass
