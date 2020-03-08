@@ -41,4 +41,4 @@ create table Reference (
 -- alter table Words change Pronunciation Pronunciation varchar(50);
 
 -- add new column into Words table .
--- alter table Words add Exchange varchar(80)
+-- alter table Words add Exchange varchar(80);

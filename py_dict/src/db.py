@@ -65,13 +65,14 @@ class DbOperator():
 			return False
 		return True
 
-	def insert_word(self, word, meaning, pron):
+	def insert_word(self, word, meaning, pron, exchange):
 		sql = ''.join([
 			'INSERT INTO Words\n',
-		    '(Word, Meaning, Pronunciation, `date`)\n',
+		    '(Word, Meaning, Pronunciation, Exchange, `date`)\n',
 		    'VALUES\n',
-		    f'("{word}", "{meaning}", "{pron}", CURDATE())\n'
+		    f'("{word}", "{meaning}", "{pron}", "{exchange}", "CURDATE()")\n'
 		])
+		print(sql)
 		try:
 			self.cursor.execute(sql)
 		except Exception as e:
@@ -95,9 +96,9 @@ class DbOperator():
 			return False
 		return True	
 
-	def update_word(self, word, meaning, pron):
+	def update_word(self, word, meaning, pron, exchange):
 		sql = ''.join([
-			f'UPDATE Words SET Meaning="{meaning}", Pronunciation="{pron}", `date`=CURDATE()\n',
+			f'UPDATE Words SET Meaning="{meaning}", Pronunciation="{pron}", Exchange="{exchange}", `date`=CURDATE()\n',
 			f'WHERE Word="{word}"'
 		])
 		try:
@@ -116,7 +117,6 @@ class DbOperator():
 		    'VALUES\n',
 		    f'("{word}", "{usage}")\n'
 		])
-		print('sql', sql)
 		try:
 			self.cursor.execute(sql)
 		except Exception as e:
@@ -138,7 +138,6 @@ class DbOperator():
 		return True
 
 	def print_messages(self):
-		print('here1')
 		print('--- All messages ---')
 		for message in self.messages:
 			print(message)
@@ -148,7 +147,8 @@ def db_access_test(db_operator):
 	db_operator.insert_word(
 		'unfathomable',
 		'adj.难以理解的;莫测高深的;(表情)难以琢磨的，微妙的',
-		'美 [ʌnˈfæðəməbl]'
+		'美 [ʌnˈfæðəməbl]',
+		'exchange placeholder'
 	)
 	db_operator.insert_usage(
 		'unfathomable',
