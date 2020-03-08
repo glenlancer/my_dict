@@ -21,6 +21,20 @@ class DbOperator():
 	def db_commit(self):
 		self.conn.commit()
 
+	def select_article(self, title):
+		sql = ''.join([
+			'select * from Article\n',
+		    f'Where title = "{title}"'
+		])
+		try:
+			self.cursor.execute(sql)
+			return self.cursor.fetchone()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of {title} failed due to {e.args[-1]}'
+			)
+			return False		
+
 	def select_word(self, word):
 		sql = ''.join([
 			'select * from Words\n',
@@ -34,6 +48,22 @@ class DbOperator():
 				f'Selection of {word} failed due to {e.args[-1]}'
 			)
 			return False		
+
+	def insert_article(self, title, content):
+		sql = ''.join([
+			'INSERT INTO Article\n',
+		    '(Title, Content)\n',
+		    'VALUES\n',
+		    f'("{title}", "{content}")\n'
+		])
+		try:
+			self.cursor.execute(sql)
+		except Exception as e:
+			self.messages.append(
+				f'Insertion of {title} failed due to {e.args[-1]}'
+			)
+			return False
+		return True
 
 	def insert_word(self, word, meaning, pron):
 		sql = ''.join([
@@ -50,6 +80,20 @@ class DbOperator():
 			)
 			return False
 		return True
+
+	def update_article(self, title, content):
+		sql = ''.join([
+			f'UPDATE Article SET Content="{content}"\n',
+			f'WHERE Title="{title}"'
+		])
+		try:
+			self.cursor.execute(sql)
+		except Exception as e:
+			self.messages.append(
+				f'Update of {title} failed due to {e.args[-1]}'
+			)
+			return False
+		return True	
 
 	def update_word(self, word, meaning, pron):
 		sql = ''.join([
@@ -82,8 +126,8 @@ class DbOperator():
 			return False
 		return True
 
-	def insert_article(self, content):
-		sql = f'INSERT INTO Article (Content) VALUES ("{content}")'
+	def insert_article(self, title, content):
+		sql = f'INSERT INTO Article (Title, Content) VALUES ("{title}", "{content}")'
 		try:
 			self.cursor.execute(sql)
 		except Exception as e:

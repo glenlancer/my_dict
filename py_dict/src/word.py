@@ -20,9 +20,17 @@ class WordUi(QWidget):
 	def initAction(self):
 		self.cancalButton.clicked.connect(self.cancel)
 		self.addButton.clicked.connect(self.add)
+		self.onlineButton.clicked.connect(self.online)
+
+	def online(self):
+		word = self.wordEdit.text().strip()
+		if word == '':
+			return
+		return
 
 	def add(self):
-		word = self.wordEdit.text().strip()
+		# word are stored in lower case.
+		word = self.wordEdit.text().strip().lower()
 		meaning = self.meanEdit.text().strip()
 		pronunciation = self.pronEdit.text().strip()
 		usage = self.usageEdit.toPlainText().strip()
@@ -51,11 +59,13 @@ class WordUi(QWidget):
 		self.close()
 
 	def initUI(self):
+		self.onlineButton = QPushButton('Search online')
 		self.addButton = QPushButton('Add new word')
 		self.cancalButton = QPushButton('Cancel')
 
 		hbox = QHBoxLayout()
 		hbox.addStretch(1)
+		hbox.addWidget(self.onlineButton)
 		hbox.addWidget(self.addButton)
 		hbox.addWidget(self.cancalButton)
 

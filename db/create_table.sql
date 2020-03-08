@@ -4,7 +4,8 @@ create table Words (
 	WID           serial,
 	Word          varchar(50) not null unique,
 	Meaning       varchar(250) not null,
-	Pronunciation varchar(50) not null,
+	Pronunciation varchar(50),
+	Exchange      varchar(100),
 	`date`        date,
 	primary key (Word)
 ) ENGINE=InnoDB Default Charset=utf8;
@@ -35,3 +36,9 @@ create table Reference (
 	foreign key (Word) references Words(Word),
 	foreign key (AID) references Article(AID)
 ) ENGINE=InnoDB Default Charset=utf8;
+
+-- alter Pronunciation not null attribute.
+-- alter table Words change Pronunciation Pronunciation varchar(50);
+
+-- add new column into Words table .
+-- alter table Words add Exchange varchar(80)
