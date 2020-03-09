@@ -5,7 +5,6 @@ from PyQt5.QtWidgets import (
 	QLabel, QLineEdit, QTextEdit,
 	QApplication, QMessageBox
 )
-from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
 from db import DbOperator
@@ -20,7 +19,7 @@ class WordUi(QWidget):
 		self.scraper = Scraper()
 		self.initUI()
 		self.initAction()
-		self.setFont(QFont('monospace', 10))
+		self.setFont(QFont('Arial', 11))
 
 	def initAction(self):
 		self.cancalButton.clicked.connect(self.cancel)
@@ -29,7 +28,7 @@ class WordUi(QWidget):
 		self.onlineButton.clicked.connect(self.online)
 
 	def online(self):
-		word = self.wordEdit.text().strip()
+		word = self.wordEdit.text().strip().lower()
 		if word == '':
 			self.infoLabel.setText('Word field empty...')
 			return
@@ -81,7 +80,7 @@ class WordUi(QWidget):
 			 (gotWordRecord[2] != meaning or gotWordRecord[3] != pronunciation \
 			 or gotWordRecord[4] != exchange):
 			res = QMessageBox.question(self, 'Question', 'About to overwrite exisiting record',
-        		QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Ok)
+					QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Ok)
 			if res == QMessageBox.Ok:
 				self.db_operator.update_word(
 					word, meaning, pronunciation, exchange
@@ -107,7 +106,6 @@ class WordUi(QWidget):
 		self.cancalButton = QPushButton('Cancel')
 
 		hbox = QHBoxLayout()
-		hbox.addWidget(self.infoLabel, 0, Qt.AlignLeft)
 		hbox.addWidget(self.onlineButton)
 		hbox.addWidget(self.addButton)
 		hbox.addWidget(self.clearButton)
@@ -126,7 +124,7 @@ class WordUi(QWidget):
 		self.pronEdit = QLineEdit(self)
 		self.pronEdit.setPlaceholderText('Word\'s pronunciation')
 		self.exchangeEdit = QLineEdit(self)
-		self.exchangeEdit.setPlaceholderText('Word\'s different forms.')
+		self.exchangeEdit.setPlaceholderText('Word\'s different forms')
 		self.usageEdit = QTextEdit(self)
 		self.usageEdit.setPlaceholderText('Word\'s usage examples...')
 		vbox_i.addWidget(wordLabel)
@@ -138,7 +136,8 @@ class WordUi(QWidget):
 		vbox_i.addWidget(exchangeLabel)
 		vbox_i.addWidget(self.exchangeEdit)
 		vbox_i.addWidget(usageLabel)
-		vbox_i.addWidget(self.usageEdit)	
+		vbox_i.addWidget(self.usageEdit)
+		vbox_i.addWidget(self.infoLabel)
 
 		vbox = QVBoxLayout()
 		vbox.addLayout(vbox_i)
@@ -146,8 +145,8 @@ class WordUi(QWidget):
 
 		self.setLayout(vbox)
 
-		self.setGeometry(300, 300, 700, 600)
-		self.setWindowTitle('Add Record')
+		self.setGeometry(300, 300, 500, 600)
+		self.setWindowTitle('Record Management')
 		self.show()
 
 if __name__ == '__main__':

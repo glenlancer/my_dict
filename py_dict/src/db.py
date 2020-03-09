@@ -21,20 +21,6 @@ class DbOperator():
 	def db_commit(self):
 		self.conn.commit()
 
-	def select_article(self, title):
-		sql = ''.join([
-			'select * from Article\n',
-		    f'Where title = "{title}"'
-		])
-		try:
-			self.cursor.execute(sql)
-			return self.cursor.fetchone()
-		except Exception as e:
-			self.messages.append(
-				f'Selection of {title} failed due to {e.args[-1]}'
-			)
-			return False		
-
 	def select_word(self, word):
 		sql = ''.join([
 			'select * from Words\n',
@@ -47,7 +33,45 @@ class DbOperator():
 			self.messages.append(
 				f'Selection of {word} failed due to {e.args[-1]}'
 			)
-			return False		
+			return None
+
+	def select_article(self, title):
+		sql = ''.join([
+			'select * from Article\n',
+		    f'Where title = "{title}"'
+		])
+		try:
+			self.cursor.execute(sql)
+			return self.cursor.fetchone()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of {title} failed due to {e.args[-1]}'
+			)
+			return None
+
+	def select_all_articles(self):
+		try:
+			self.cursor.execute(
+				'select AID, Content from Article'
+			)
+			return self.cursor.fetchall()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of all articles failed due to {e.args[-1]}'
+			)
+			return None
+
+	def select_all_words(self):
+		try:
+			self.cursor.execute(
+				'select Word from Words'
+			)
+			return self.cursor.fetchall()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of all words failed due to {e.args[-1]}'
+			)
+		return None
 
 	def insert_article(self, title, content):
 		sql = ''.join([
@@ -133,6 +157,27 @@ class DbOperator():
 		except Exception as e:
 			self.messages.append(
 				f'Insertion of article failed due to {e.args[-1]}'
+			)
+			return False
+		return True
+
+	def truncate_reference(self):
+		try:
+			self.cursor.execute('TRUNCATE TABLE Reference')
+		except Exception as e:
+			self.messages.append(
+				f'Truncate table Referebce failed due to {e.args[-1]}'
+			)
+			return False
+		return True
+
+	def insert_reference(self, word, aid):
+		sql = f'INSERT INTO Reference (Word, AID) VALUES ("{word}", "{aid}")'
+		try:
+			self.cursor.execute(sql)
+		except Exception as e:
+			self.messages.append(
+				f'Insertion of reference {word}<->{aid} failed due to {e.args[-1]}'
 			)
 			return False
 		return True
