@@ -6,7 +6,7 @@ create table Words (
 	Meaning       varchar(250) not null,
 	Pronunciation varchar(50),
 	Exchange      varchar(100),
-	`date`        date,
+	`date`        datetime not null,
 	primary key (Word)
 ) ENGINE=InnoDB Default Charset=utf8;
 
@@ -42,3 +42,6 @@ create table Reference (
 
 -- add new column into Words table .
 -- alter table Words add Exchange varchar(80);
+
+-- alter Words `date` attribute.
+-- alter table Words modify column `date` datetime not null;

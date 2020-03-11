@@ -1,0 +1,99 @@
+#!/usr/bin/python3
+
+import sys
+from PyQt5.QtWidgets import (
+	QWidget, QApplication,
+	QHBoxLayout, QVBoxLayout,
+	QRadioButton, QButtonGroup,
+	QPushButton, QLineEdit,
+	QLabel, QListWidget
+)
+from PyQt5.QtGui import QFont
+
+from .db import DbOperator
+
+class DeleterUi(QWidget):
+	def __init__(self, db_operator):
+		super().__init__()
+		self.deleteType = 'word'
+		self.db_operator = db_operator
+		self.initUI()
+		self.initAction()
+		self.setFont(QFont('Arial', 11))
+		self.results = None
+		self.radioBtnWord.setChecked(True)
+
+	def searchRecords(self, key=None):
+		self.resultList.clear()
+		if key in (None, False):
+			key = self.searchText.text().strip()
+		key = key.lower()
+		if self.deleteType == 'word':
+			if key == '':
+				self.results = self.db_operator.select_all_words()
+			else:
+				self.results = self.db_operator.select_like_word(key)
+		else:
+			if key == '':
+				self.results = self.db_operator.select_all_articles()
+			else:
+				self.results = self.db_operator.select_like_article(key)
+		self.results = list(self.results)
+		self.results = list(map(lambda x: x[0], self.results))
+		self.resultList.addItems(self.results)
+
+	def initAction(self):
+		self.searchText.textChanged.connect(self.searchRecords)
+		self.searchButton.clicked.connect(self.searchRecords)
+
+	def initUI(self):
+		hbox_1 = QHBoxLayout()
+		self.radioBtnWord = QRadioButton('Word')
+		self.radioBtnArticle = QRadioButton('Article')
+		self.radioBtnGroup = QButtonGroup()
+		self.radioBtnGroup.addButton(self.radioBtnWord)
+		self.radioBtnGroup.addButton(self.radioBtnArticle)
+		self.radioBtnWord.toggled.connect(
+			lambda : self.btnState(self.radioBtnWord)
+		)
+		self.radioBtnArticle.toggled.connect(
+			lambda : self.btnState(self.radioBtnArticle)
+		)
+		hbox_1.addWidget(self.radioBtnWord)
+		hbox_1.addWidget(self.radioBtnArticle)
+
+		hbox_2 = QHBoxLayout()
+		self.searchText = QLineEdit(self)
+		self.searchButton = QPushButton('Search')
+		hbox_2.addWidget(self.searchText)
+		hbox_2.addWidget(self.searchButton)
+
+		vbox_i = QVBoxLayout()
+		searchLabel = QLabel('Search Result:')
+		self.resultList = QListWidget()
+		vbox_i.addWidget(searchLabel)
+		vbox_i.addWidget(self.resultList)
+
+		vbox = QVBoxLayout()
+		vbox.addLayout(hbox_1)
+		vbox.addLayout(hbox_2)
+		vbox.addLayout(vbox_i)
+		self.setLayout(vbox)
+		self.setGeometry(300, 300, 400, 600)
+		self.setWindowTitle('Delete Records')
+
+	def btnState(self, button):
+		if button.text() == 'Word' and self.deleteType != 'word':
+			self.deleteType = 'word'
+			self.searchText.setPlaceholderText('Word to search')
+		elif button.text() == 'Article' and self.deleteType != 'article':
+			self.deleteType = 'article'
+			self.searchText.setPlaceholderText('Title of Article to search')
+		self.resultList.clear()
+
+if __name__ == '__main__':
+	app = QApplication(sys.argv)
+	db_operator = DbOperator()
+	ex = DeleterUi(db_operator)
+	ex.show()
+	sys.exit(app.exec_())

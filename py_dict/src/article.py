@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys
 from PyQt5.QtWidgets import (
 	QWidget, QPushButton,
@@ -7,11 +9,11 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont
 
-from db import DbOperator
+from .db import DbOperator
 
 # https://pythonprogramminglanguage.com/pyqt-line-edit/
 
-class WordUi(QWidget):
+class ArticleUi(QWidget):
 	def __init__(self, db_operator):
 		super().__init__()
 		self.db_operator = db_operator
@@ -89,10 +91,9 @@ class WordUi(QWidget):
 
 		self.setGeometry(300, 300, 500, 600)
 		self.setWindowTitle('Article Management')
-		self.show()
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
 	db_operator = DbOperator()
-	ex = WordUi(db_operator)
+	ex = ArticleUi(db_operator)
 	sys.exit(app.exec_())

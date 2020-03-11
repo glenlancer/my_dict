@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys, re
 from PyQt5.QtWidgets import (
 	QWidget, QPushButton,
@@ -8,7 +10,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 
-from db import DbOperator
+from .db import DbOperator
 
 class MappingUi(QWidget):
 	def __init__(self, db_operator):
@@ -24,7 +26,7 @@ class MappingUi(QWidget):
 
 	def create(self):
 		all_words = self.db_operator.select_all_words()
-		all_articles = self.db_operator.select_all_articles()
+		all_articles = self.db_operator.select_all_articles_for_mapping()
 		if all_words is None:
 			self.infoLabel.setText('There are no word found.')
 			return
@@ -93,7 +95,6 @@ class MappingUi(QWidget):
 
 		self.setGeometry(300, 300, 450, 60)
 		self.setWindowTitle('Mapping')
-		self.show()
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)

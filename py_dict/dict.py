@@ -8,7 +8,12 @@ from PyQt5.QtWidgets import (
 	QLabel, QTextEdit,
 	QPushButton, QLineEdit, QListWidget
 )
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont
+from src.word import WordUi
+from src.article import ArticleUi
+from src.mapping import MappingUi
+from src.deleter import DeleterUi
+from src.db import DbOperator
 
 # https://pythonspot.com/pyqt5-horizontal-layout/
 class App(QMainWindow):
@@ -19,8 +24,65 @@ class App(QMainWindow):
 		self.top = 10
 		self.width = 820
 		self.height = 500
+		self.db_operator = DbOperator()
+		self.word_ui = WordUi(self.db_operator)
+		self.article_ui = ArticleUi(self.db_operator)
+		self.mapping_ui = MappingUi(self.db_operator)
+		self.deleter_ui = DeleterUi(self.db_operator)
 		self.setupMenus()
 		self.initUI()
+		self.initAction()
+		self.setFont(QFont('Arial', 11))
+		self.results = None
+
+	def initAction(self):
+		self.wordEdit.textChanged.connect(self.searchRecords)
+		self.searchBtn.clicked.connect(self.searchRecords)
+		self.wordList.clicked.connect(self.wordListClicked)
+
+	def showWordDetail(self, word):
+		record = self.db_operator.select_word(word)
+		self.meaning.setText(record[2])
+		self.sound.setText(record[3])
+		self.exchange.setText(record[5])
+		usages = self.db_operator.select_usages(word)
+		all_usage = ''
+		for usage in usages:
+			if all_usage != '':
+				all_usage += '\n'
+			all_usage += usage[0]
+		self.usageEdit.setText(all_usage)
+
+	def wordListClicked(self, index):
+		self.clearRightPanel()
+		i = index.row()
+		print(dir(self.wordList))
+		item = self.wordList.item(i).text()
+		self.showWordDetail(item)
+
+	def clearUi(self):
+		self.wordList.clear()
+		self.clearRightPanel()
+
+	def clearRightPanel(self):
+		self.meaning.setText('')
+		self.sound.setText('')
+		self.exchange.setText('')
+		self.usageEdit.setPlainText('')
+		self.articleList.clear()
+
+	def searchRecords(self, key=None):
+		self.clearUi()
+		if key in (None, False):
+			key = self.wordEdit.text().strip()
+		key = key.lower()
+		if key == '':
+			self.results = self.db_operator.select_all_words()
+		else:
+			self.results = self.db_operator.select_like_word(key)
+		self.results = list(self.results)
+		self.results = list(map(lambda x: x[0], self.results))
+		self.wordList.addItems(self.results)
 
 	def initUI(self):
 		main = QHBoxLayout()
@@ -28,6 +90,7 @@ class App(QMainWindow):
 		grid = QGridLayout()
 		grid.setSpacing(10)
 		self.wordEdit = QLineEdit()
+		self.wordEdit.setPlaceholderText('Word to search')
 		self.searchBtn = QPushButton('Search')
 		self.wordList = QListWidget()
 		grid.addWidget(self.wordEdit, 1, 1, 1, 2)
@@ -40,16 +103,22 @@ class App(QMainWindow):
 		grid2.setSpacing(10)
 		self.meaning = QLineEdit()
 		self.sound = QLineEdit()
+		self.exchange = QLineEdit()
 		usageLabel = QLabel('Usage')
 		articleLabel = QLabel('Article')
 		self.usageEdit = QTextEdit()
 		self.articleList = QListWidget()
 		grid2.addWidget(self.meaning, 1, 1)
+		self.meaning.setPlaceholderText('Word\'s meaning to show here.')
 		grid2.addWidget(self.sound, 2, 1)
-		grid2.addWidget(usageLabel, 3, 1)
-		grid2.addWidget(self.usageEdit, 4, 1, 4, 1)
-		grid2.addWidget(articleLabel, 8, 1)
-		grid2.addWidget(self.articleList, 9, 1, 5, 1)
+		self.sound.setPlaceholderText('Word\'s pronunciation to show here.')
+		grid2.addWidget(self.exchange, 3, 1)
+		self.exchange.setPlaceholderText('Word\'s different types to show here.')
+		grid2.addWidget(usageLabel, 4, 1)
+		grid2.addWidget(self.usageEdit, 5, 1, 4, 1)
+		self.usageEdit.setPlaceholderText('Word\'s usage to show here')
+		grid2.addWidget(articleLabel, 9, 1)
+		grid2.addWidget(self.articleList, 10, 1, 5, 1)
 		gridWidget2 = QWidget()
 		gridWidget2.setLayout(grid2)
 
@@ -67,20 +136,24 @@ class App(QMainWindow):
 		menuBar = self.menuBar()
 		appMenu = menuBar.addMenu('&App')
 
-		addWordAction = QAction('Add &Word', self)
-		addWordAction.setStatusTip('Add new word')
+		addWordAction = QAction('&Record', self)
+		addWordAction.setStatusTip('Add Word & Usage')
+		addWordAction.triggered.connect(self.word_ui.show)
 		appMenu.addAction(addWordAction)
 
-		addArticleAction = QAction('Add &Article', self)
-		addArticleAction.setStatusTip('Add new article')
+		addArticleAction = QAction('&Article', self)
+		addArticleAction.setStatusTip('Add Article')
+		addArticleAction.triggered.connect(self.article_ui.show)
 		appMenu.addAction(addArticleAction)
 
-		deleteAction = QAction('Delete &Record', self)
-		deleteAction.setStatusTip('Delete a record')
+		deleteAction = QAction('Delete &Records', self)
+		deleteAction.setStatusTip('Delete Records')
+		deleteAction.triggered.connect(self.deleter_ui.show)
 		appMenu.addAction(deleteAction)
 
-		matchAction = QAction('&Match Article', self)
-		matchAction.setStatusTip('Match articles with words')
+		matchAction = QAction('&Matchmaking', self)
+		matchAction.setStatusTip('Mapping Words and Articles')
+		matchAction.triggered.connect(self.mapping_ui.show)
 		appMenu.addAction(matchAction)
 
 		exitAction = QAction('&Exit', self)

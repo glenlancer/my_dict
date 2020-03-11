@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 import sys
 from PyQt5.QtWidgets import (
 	QWidget, QPushButton,
@@ -7,8 +9,8 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont
 
-from db import DbOperator
-from scraper import Scraper
+from .db import DbOperator
+from .scraper import Scraper
 
 # https://pythonprogramminglanguage.com/pyqt-line-edit/
 
@@ -147,7 +149,6 @@ class WordUi(QWidget):
 
 		self.setGeometry(300, 300, 500, 600)
 		self.setWindowTitle('Record Management')
-		self.show()
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)

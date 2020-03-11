@@ -35,6 +35,34 @@ class DbOperator():
 			)
 			return None
 
+	def select_usages(self, word):
+		sql = ''.join([
+			'select `Usage` from `Usage`\n',
+		    f'Where Word = "{word}"'
+		])
+		try:
+			self.cursor.execute(sql)
+			return self.cursor.fetchall()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of usage for {word} failed due to {e.args[-1]}'
+			)
+			return None		
+
+	def select_like_word(self, word):
+		sql = ''.join([
+			'SELECT Word FROM Words\n',
+		    f'WHERE Word like "%{word}%"'
+		])
+		try:
+			self.cursor.execute(sql)
+			return self.cursor.fetchall()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of {word} failed due to {e.args[-1]}'
+			)
+			return None
+
 	def select_article(self, title):
 		sql = ''.join([
 			'select * from Article\n',
@@ -49,7 +77,33 @@ class DbOperator():
 			)
 			return None
 
+	def select_like_article(self, title):
+		sql = ''.join([
+			'SELECT Title FROM Article\n',
+		    f'WHERE Title like "%{title}%"'
+		])
+		try:
+			self.cursor.execute(sql)
+			return self.cursor.fetchall()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of {word} like articles failed due to {e.args[-1]}'
+			)
+			return None
+
 	def select_all_articles(self):
+		try:
+			self.cursor.execute(
+				'select Title from Article'
+			)
+			return self.cursor.fetchall()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of all titles of articles failed due to {e.args[-1]}'
+			)
+			return None		
+
+	def select_all_articles_for_mapping(self):
 		try:
 			self.cursor.execute(
 				'select AID, Content from Article'
@@ -94,9 +148,8 @@ class DbOperator():
 			'INSERT INTO Words\n',
 		    '(Word, Meaning, Pronunciation, Exchange, `date`)\n',
 		    'VALUES\n',
-		    f'("{word}", "{meaning}", "{pron}", "{exchange}", "CURDATE()")\n'
+		    f'("{word}", "{meaning}", "{pron}", "{exchange}", CURDATE())'
 		])
-		print(sql)
 		try:
 			self.cursor.execute(sql)
 		except Exception as e:
