@@ -63,10 +63,25 @@ class DbOperator():
 			)
 			return None
 
+	def select_article_for_word(self, word):
+		sql = ''.join([
+			'select Title, Content from Article\n',
+			'join Reference on Reference.AID = Article.AID\n',
+			f'where Word = "{word}"'
+		])
+		try:
+			self.cursor.execute(sql)
+			return self.cursor.fetchall()
+		except Exception as e:
+			self.messages.append(
+				f'Selection of Article for {word} failed due to {e.args[-1]}'
+			)
+			return None
+
 	def select_article(self, title):
 		sql = ''.join([
 			'select * from Article\n',
-		    f'Where title = "{title}"'
+		    f'where title = "{title}"'
 		])
 		try:
 			self.cursor.execute(sql)

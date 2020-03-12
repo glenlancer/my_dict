@@ -34,6 +34,7 @@ class App(QMainWindow):
 		self.initAction()
 		self.setFont(QFont('Arial', 11))
 		self.results = None
+		self.articles = {}
 
 	def initAction(self):
 		self.wordEdit.textChanged.connect(self.searchRecords)
@@ -44,7 +45,7 @@ class App(QMainWindow):
 		record = self.db_operator.select_word(word)
 		self.meaning.setText(record[2])
 		self.sound.setText(record[3])
-		self.exchange.setText(record[5])
+		self.exchange.setText(record[4])
 		usages = self.db_operator.select_usages(word)
 		all_usage = ''
 		for usage in usages:
@@ -52,11 +53,15 @@ class App(QMainWindow):
 				all_usage += '\n'
 			all_usage += usage[0]
 		self.usageEdit.setText(all_usage)
+		res_articles = self.db_operator.select_article_for_word(word)
+		for article in res_articles:
+			self.articles[article[0]] = article[1]
+		for key in self.articles.keys():
+			self.articleList.addItem(key)
 
 	def wordListClicked(self, index):
 		self.clearRightPanel()
 		i = index.row()
-		print(dir(self.wordList))
 		item = self.wordList.item(i).text()
 		self.showWordDetail(item)
 
@@ -70,6 +75,7 @@ class App(QMainWindow):
 		self.exchange.setText('')
 		self.usageEdit.setPlainText('')
 		self.articleList.clear()
+		self.articles.clear()
 
 	def searchRecords(self, key=None):
 		self.clearUi()

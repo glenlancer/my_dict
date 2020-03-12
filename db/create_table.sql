@@ -30,12 +30,15 @@ create table Article (
 -- REFERENCE
 create table Reference (
 	RID serial,
-	Word varchar(50) not null unique,
+	Word varchar(50) not null,
 	AID  bigint unsigned not null,
 	primary key (RID),
 	foreign key (Word) references Words(Word),
 	foreign key (AID) references Article(AID)
 ) ENGINE=InnoDB Default Charset=utf8;
+
+-- test data
+
 
 -- alter Pronunciation not null attribute.
 -- alter table Words change Pronunciation Pronunciation varchar(50);
