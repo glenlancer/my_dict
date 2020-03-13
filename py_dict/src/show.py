@@ -9,13 +9,13 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtGui import QFont
 
-from db import DbOperator
+from .db import DbOperator
 
 class ShowerUi(QWidget):
-	def __init__(self, type=None, content=None, db_operator=None):
+	def __init__(self, db_operator=None):
 		super().__init__()
-		self.type = type
-		self.content = content
+		self.type = 'show_word'
+		self.content = None
 		self.db_operator = db_operator
 		self.initUI()
 		self.initAction()
@@ -40,14 +40,10 @@ class ShowerUi(QWidget):
 
 		self.setLayout(vbox)
 		self.setGeometry(300, 300, 400, 400)
-		if self.type == 'show_word':
-			self.setWindowTitle('Word\'s details')
-		else:
-			title = self.content['title']
-			self.setWindowTitle(f'{self.content["title"]}')
-		self.initWebView()
 
-	def initWebView(self):
+	def initWebView(self, show_type, content):
+		self.type = show_type
+		self.content = content
 		if self.type == 'show_word':
 			self.webView.setHtml(f'''
         <strong>{self.content["word"]}</strong>
@@ -67,13 +63,14 @@ class ShowerUi(QWidget):
         	{self.content["usage"]}
         </p>
 			''')
+			self.setWindowTitle('Word\'s details')
 		else:
 			html = f'<h5>{self.content["title"]}</h5>'
 			paragraphs = self.content['content'].split('\n\n')
-			print(paragraphs)
 			for paragraph in paragraphs:
 				html += f'<p>{paragraph}</p>'
 			self.webView.setHtml(html)
+			self.setWindowTitle(f'{self.content["title"]}')
 
 	def initAction(self):
 		if self.db_operator:
@@ -104,6 +101,7 @@ This is 2nd paragraph.
 This is a thrid.
 		'''
 	}
-	ex = ShowerUi(content2['type'], content2)
+	ex = ShowerUi(db_operator)
+	ex.initWebView(content2['type'], content2)
 	ex.show()
 	sys.exit(app.exec_())

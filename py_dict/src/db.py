@@ -220,6 +220,7 @@ class DbOperator():
 
 	def insert_article(self, title, content):
 		sql = f'INSERT INTO Article (Title, Content) VALUES ("{title}", "{content}")'
+		print(sql)
 		try:
 			self.cursor.execute(sql)
 		except Exception as e:
@@ -254,6 +255,7 @@ class DbOperator():
 		print('--- All messages ---')
 		for message in self.messages:
 			print(message)
+		self.messages = []
 		print('--- End of all messages ---')
 
 def db_access_test(db_operator):

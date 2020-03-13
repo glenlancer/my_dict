@@ -13,6 +13,8 @@ from src.word import WordUi
 from src.article import ArticleUi
 from src.mapping import MappingUi
 from src.deleter import DeleterUi
+from src.show import ShowerUi
+from src.function import *
 from src.db import DbOperator
 
 # https://pythonspot.com/pyqt5-horizontal-layout/
@@ -29,6 +31,7 @@ class App(QMainWindow):
 		self.article_ui = ArticleUi(self.db_operator)
 		self.mapping_ui = MappingUi(self.db_operator)
 		self.deleter_ui = DeleterUi(self.db_operator)
+		self.shower_ui = ShowerUi()
 		self.setupMenus()
 		self.initUI()
 		self.initAction()
@@ -40,6 +43,7 @@ class App(QMainWindow):
 		self.wordEdit.textChanged.connect(self.searchRecords)
 		self.searchBtn.clicked.connect(self.searchRecords)
 		self.wordList.clicked.connect(self.wordListClicked)
+		self.articleList.clicked.connect(self.articleListClicked)
 
 	def showWordDetail(self, word):
 		record = self.db_operator.select_word(word)
@@ -64,6 +68,23 @@ class App(QMainWindow):
 		i = index.row()
 		item = self.wordList.item(i).text()
 		self.showWordDetail(item)
+
+	def articleListClicked(self, index):
+		i = index.row()
+		item = self.articleList.item(i).text()
+		article_record = self.db_operator.select_article(item)
+		if article_record:
+			content = {
+				'title': article_record[1],
+				'content': article_record[2]
+			}
+		else:
+			conent = {
+				'title': 'No record',
+				'content': 'There is no relevant article found.'
+			}
+		self.shower_ui.initWebView('show_article', content)
+		self.shower_ui.show()
 
 	def clearUi(self):
 		self.wordList.clear()
