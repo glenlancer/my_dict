@@ -1,3 +1,6 @@
+-- Switch to new database
+use dict_db;
+
 -- Tables used for my_dict program.
 -- WORDS
 create table Words (
@@ -31,20 +34,8 @@ create table Article (
 create table Reference (
 	RID serial,
 	Word varchar(50) not null,
-	AID  bigint unsigned not null,
+	Title varchar(100) not null,
 	primary key (RID),
 	foreign key (Word) references Words(Word),
-	foreign key (AID) references Article(AID)
+	foreign key (Title) references Article(Title)
 ) ENGINE=InnoDB Default Charset=utf8;
-
--- test data
-
-
--- alter Pronunciation not null attribute.
--- alter table Words change Pronunciation Pronunciation varchar(50);
-
--- add new column into Words table .
--- alter table Words add Exchange varchar(80);
-
--- alter Words `date` attribute.
--- alter table Words modify column `date` datetime not null;

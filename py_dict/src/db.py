@@ -65,8 +65,8 @@ class DbOperator():
 
 	def select_article_for_word(self, word):
 		sql = ''.join([
-			'select Title, Content from Article\n',
-			'join Reference on Reference.AID = Article.AID\n',
+			'select Article.Title, Content from Article\n',
+			'join Reference on Reference.Title = Article.Title\n',
 			f'where Word = "{word}"'
 		])
 		try:
@@ -121,7 +121,7 @@ class DbOperator():
 	def select_all_articles_for_mapping(self):
 		try:
 			self.cursor.execute(
-				'select AID, Content from Article'
+				'select Title, Content from Article'
 			)
 			return self.cursor.fetchall()
 		except Exception as e:
@@ -240,13 +240,47 @@ class DbOperator():
 			return False
 		return True
 
-	def insert_reference(self, word, aid):
-		sql = f'INSERT INTO Reference (Word, AID) VALUES ("{word}", "{aid}")'
+	def insert_reference(self, word, title):
+		sql = f'INSERT INTO Reference (Word, Title) VALUES ("{word}", "{title}")'
+		print(sql)
 		try:
 			self.cursor.execute(sql)
 		except Exception as e:
 			self.messages.append(
-				f'Insertion of reference {word}<->{aid} failed due to {e.args[-1]}'
+				f'Insertion of reference {word}<->{title} failed due to {e.args[-1]}'
+			)
+			return False
+		return True
+
+	def delete_a_word(self, word):
+		sqls = [
+			'DELETE FROM Reference WHERE Word="{}"'.format(word),
+			'DELETE FROM `Usage` WHERE Word="{}"'.format(word),
+			'DELETE FROM Words WHERE Word="{}"'.format(word)
+		]
+		try:
+			for sql in sqls:
+				self.cursor.execute(sql)
+			self.db_commit()
+		except Exception as e:
+			self.messages.append(
+				f'Deletion of {word} failed due to {e.args[-1]}'
+			)
+			return False
+		return True
+
+	def delete_a_article(self, title):
+		sql = [
+			'DELETE FROM Reference WHERE Title="{}"'.format(title),
+			'DELETE FROM Article WHERE Title="{}"'.format(title)
+		]
+		try:
+			for sql in sqls:
+				self.cursor.execute(sql)
+			self.db_commit()
+		except Exception as e:
+			self.messages.append(
+				f'Deletion of {article} failed due to {e.args[-1]}'
 			)
 			return False
 		return True

@@ -2,21 +2,24 @@
 
 import sys
 from PyQt5.QtWidgets import (
-	QWidget, QPushButton,
-	QHBoxLayout, QVBoxLayout,
-	QLabel, QApplication
+	QWidget, QApplication, QHBoxLayout, QVBoxLayout, QLabel, QPushButton
 )
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 
 from .db import DbOperator
 
 class ShowerUi(QWidget):
-	def __init__(self, db_operator=None):
+	def __init__(self, db_operator=None, parent_win=None):
 		super().__init__()
 		self.type = 'show_word'
 		self.content = None
+		self.parent_win = parent_win
 		self.db_operator = db_operator
+		if self.db_operator:
+			self.setWindowModality(Qt.WindowModal)
+			self.deletion_count = 0
 		self.initUI()
 		self.initAction()
 		self.setFont(QFont('Arial', 11))
@@ -41,19 +44,24 @@ class ShowerUi(QWidget):
 		self.setLayout(vbox)
 		self.setGeometry(300, 300, 400, 400)
 
+	def closeEvent(self, event):
+		if self.parent_win and self.deletion_count > 0:
+			self.parent_win.clearResultList()
+
 	def initWebView(self, show_type, content):
 		self.type = show_type
 		self.content = content
-		if self.type == 'show_word':
+		if self.content is None:
+			self.webView.setHtml('<p>Content 404 :(</p>')
+			self.setWindowTitle('The record is nil')
+		elif self.type == 'show_word':
 			self.webView.setHtml(f'''
         <strong>{self.content["word"]}</strong>
         <p>
-        	<span>
-        	Meaning: {self.content["meaning"]}
-        	</span><br>
-        	<span>
-        	Pronunciation: {self.content["sound"]}
-        	</span><br>
+        	<strong>Meaning</strong>: {self.content["meaning"]}
+        	<br>
+        	<strong>Pronunciation<strong>: {self.content["sound"]}
+        	<br>
         	<span>
         	Forms: {self.content["exchange"]}
         	</span>
@@ -77,7 +85,16 @@ class ShowerUi(QWidget):
 			self.deleteButton.clicked.connect(self.deleteRecord)
 
 	def deleteRecord(self):
-		pass
+		if self.type == 'show_word':
+			res = self.db_operator.delete_a_word(self.content['word'])
+		else:
+			res = self.db_operator.delete_a_article(self.content['title'])
+		self.db_operator.print_messages()
+		if res:
+			self.deletion_count += 1
+			self.infoLabel.setText('Recrod has been deleted.')
+		else:
+			self.infoLabel.setText('There is an error happened during deletion.')
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)

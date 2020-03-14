@@ -39,6 +39,13 @@ class App(QMainWindow):
 		self.results = None
 		self.articles = {}
 
+	def closeEvent(self, event):
+		self.word_ui.close()
+		self.article_ui.close()
+		self.mapping_ui.close()
+		self.deleter_ui.close()
+		self.shower_ui.close()
+
 	def initAction(self):
 		self.wordEdit.textChanged.connect(self.searchRecords)
 		self.searchBtn.clicked.connect(self.searchRecords)
@@ -58,6 +65,8 @@ class App(QMainWindow):
 			all_usage += usage[0]
 		self.usageEdit.setText(all_usage)
 		res_articles = self.db_operator.select_article_for_word(word)
+		if res_articles is None:
+			res_articles = []
 		for article in res_articles:
 			self.articles[article[0]] = article[1]
 		for key in self.articles.keys():

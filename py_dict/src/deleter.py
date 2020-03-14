@@ -11,12 +11,14 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QFont
 
 from .db import DbOperator
+from .show import ShowerUi
 
 class DeleterUi(QWidget):
 	def __init__(self, db_operator):
 		super().__init__()
 		self.deleteType = 'word'
 		self.db_operator = db_operator
+		self.shower_ui = ShowerUi(self.db_operator, self)
 		self.initUI()
 		self.initAction()
 		self.setFont(QFont('Arial', 11))
@@ -45,6 +47,7 @@ class DeleterUi(QWidget):
 	def initAction(self):
 		self.searchText.textChanged.connect(self.searchRecords)
 		self.searchButton.clicked.connect(self.searchRecords)
+		self.resultList.clicked.connect(self.resultListClicked)
 
 	def initUI(self):
 		hbox_1 = QHBoxLayout()
@@ -90,6 +93,43 @@ class DeleterUi(QWidget):
 			self.deleteType = 'article'
 			self.searchText.setPlaceholderText('Title of Article to search')
 		self.resultList.clear()
+
+	def clearResultList(self):
+		self.resultList.clear()
+
+	def resultListClicked(self, index):
+		i = index.row()
+		item = self.resultList.item(i).text()
+		if self.deleteType == 'word':
+			record = self.db_operator.select_word(item)
+			usages = self.db_operator.select_usages(item)
+			if None in (record, usages):
+				content = None
+			else:
+				all_usage = ''
+				for usage in usages:
+					if all_usage != '':
+						all_usage += '\n'
+					all_usage += usage[0]
+				content = {
+					'word': record[1],
+					'meaning': record[2],
+					'sound': record[3],
+					'exchange': record[4],
+					'usage': all_usage
+				}
+			self.shower_ui.initWebView('show_word', content)
+		else:
+			record = self.db_operator.select_article(item)
+			if record is None:
+				content = None
+			else:
+				content = {
+					'title': record[1],
+					'content': record[2]
+				}
+			self.shower_ui.initWebView('show_article', content)
+		self.shower_ui.show()
 
 if __name__ == '__main__':
 	app = QApplication(sys.argv)
