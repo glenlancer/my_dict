@@ -270,7 +270,7 @@ class DbOperator():
 		return True
 
 	def delete_a_article(self, title):
-		sql = [
+		sqls = [
 			'DELETE FROM Reference WHERE Title="{}"'.format(title),
 			'DELETE FROM Article WHERE Title="{}"'.format(title)
 		]
@@ -280,7 +280,7 @@ class DbOperator():
 			self.db_commit()
 		except Exception as e:
 			self.messages.append(
-				f'Deletion of {article} failed due to {e.args[-1]}'
+				f'Deletion of {title} failed due to {e.args[-1]}'
 			)
 			return False
 		return True

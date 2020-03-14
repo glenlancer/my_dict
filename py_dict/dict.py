@@ -54,6 +54,11 @@ class App(QMainWindow):
 
 	def showWordDetail(self, word):
 		record = self.db_operator.select_word(word)
+		if record is None:
+			self.statusBar().showMessage('The word doesn\'t exist, reselect word list.')
+			self.wordList.clear()
+			self.searchRecords(self.wordEdit.text().strip().lower())
+			return
 		self.meaning.setText(record[2])
 		self.sound.setText(record[3])
 		self.exchange.setText(record[4])

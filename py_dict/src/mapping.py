@@ -20,6 +20,9 @@ class MappingUi(QWidget):
 		self.initAction()
 		self.setFont(QFont('Arial', 11))
 
+	def closeEvent(self, event):
+		self.progressBar.setValue(0)
+
 	def initAction(self):
 		self.createButton.clicked.connect(self.create)
 		self.cancelButton.clicked.connect(self.cancel)
