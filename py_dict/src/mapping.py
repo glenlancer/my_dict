@@ -41,7 +41,6 @@ class MappingUi(QWidget):
 			f'between {self.total_count} words and {self.total_article} articles.')
 
 	def create_mapping(self, all_words, all_articles):
-		print(all_articles)
 		index = 0
 		self.count = 0
 		self.db_operator.truncate_reference()

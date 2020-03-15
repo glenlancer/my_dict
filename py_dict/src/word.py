@@ -89,16 +89,24 @@ class WordUi(QWidget):
 			self.infoLabel.setText('Word doesn\'t exist, gave up insertion of usage.')
 			return
 		if usage:
+			usage = escape_double_quotes(usage)
 			self.db_operator.insert_usage(word, usage)
 		self.db_operator.db_commit()
 		self.db_operator.print_messages()
 
 	def process_word(self, word, meaning, pronunciation, exchange):
 		record = self.db_operator.select_word(word)
+		esed_meaning = escape_double_quotes(meaning)
+		esed_pronunciation = escape_double_quotes(pronunciation)
+		esed_exchange = escape_double_quotes(exchange)
 		if record is None:
-			return self.process_insert_word(word, meaning, pronunciation, exchange)
+			return self.process_insert_word(
+				word, esed_meaning, esed_pronunciation, esed_exchange
+			)
 		elif self.process_update_word_check(record, meaning, pronunciation, exchange):
-			self.process_update_word(word, meaning, pronunciation, exchange)
+			self.process_update_word(
+				word, esed_meaning, esed_pronunciation, esed_exchange
+			)
 		else:
 			self.infoLabel.setText('Word not updated, info not enough or the same.')		
 		return True
@@ -131,7 +139,12 @@ class WordUi(QWidget):
 			res = self.db_operator.update_word(
 				word, meaning, pronunciation, exchange
 			)
-			self.infoLabel.setText('Existing word updated...')
+			if res:
+				self.infoLabel.setText('Existing word updated.')
+			else:
+				self.infoLabel.setText(
+					f'There was an error during update; {word} not updated.'
+				)
 		else:
 			self.infoLabel.setText('Gave up...')
 

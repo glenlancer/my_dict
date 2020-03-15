@@ -2,11 +2,8 @@
 
 import sys
 from PyQt5.QtWidgets import (
-	QWidget, QApplication,
-	QHBoxLayout, QVBoxLayout,
-	QRadioButton, QButtonGroup,
-	QPushButton, QLineEdit,
-	QLabel, QListWidget
+	QWidget, QApplication, QHBoxLayout, QVBoxLayout,
+	QRadioButton, QButtonGroup, QPushButton, QLineEdit, QLabel, QListWidget
 )
 from PyQt5.QtGui import QFont
 
@@ -106,17 +103,12 @@ class DeleterUi(QWidget):
 			if None in (record, usages):
 				content = None
 			else:
-				all_usage = ''
-				for usage in usages:
-					if all_usage != '':
-						all_usage += '\n'
-					all_usage += usage[0]
 				content = {
 					'word': record[1],
 					'meaning': record[2],
 					'sound': record[3],
 					'exchange': record[4],
-					'usage': all_usage
+					'usage': combine_usage_str(usages)
 				}
 			self.shower_ui.initWebView('show_word', content)
 		else:
