@@ -18,6 +18,7 @@ from src.function import *
 from src.db import DbOperator
 
 # https://pythonspot.com/pyqt5-horizontal-layout/
+
 class App(QMainWindow):
 	def __init__(self):
 		super().__init__()
@@ -45,6 +46,7 @@ class App(QMainWindow):
 		self.mapping_ui.close()
 		self.deleter_ui.close()
 		self.shower_ui.close()
+		self.db_operator.db_close()
 
 	def initAction(self):
 		self.wordEdit.textChanged.connect(self.searchRecords)

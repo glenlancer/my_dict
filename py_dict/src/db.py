@@ -24,6 +24,7 @@ class DbOperator():
 	def db_fetchone(self, sql):
 		try:
 			self.cursor.execute(sql)
+			# When result is empty, fetchone() returns None.
 			return self.cursor.fetchone()
 		except Exception as e:
 			self.messages.append(
@@ -41,7 +42,7 @@ class DbOperator():
 			)
 			return tuple()
 
-	def db_execute(self, sql)
+	def db_execute(self, sql):
 		try:
 			self.cursor.execute(sql)
 		except Exception as e:
