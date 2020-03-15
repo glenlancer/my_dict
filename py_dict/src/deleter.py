@@ -21,7 +21,7 @@ class DeleterUi(QWidget):
 		self.shower_ui = ShowerUi(self.db_operator, self)
 		self.initUI()
 		self.initAction()
-		self.setFont(QFont('Arial', 11))
+		self.setFont(QFont('Noto San', 9))
 		self.results = None
 		self.radioBtnWord.setChecked(True)
 

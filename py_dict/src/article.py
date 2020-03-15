@@ -19,7 +19,7 @@ class ArticleUi(QWidget):
 		self.db_operator = db_operator
 		self.initUI()
 		self.initAction()
-		self.setFont(QFont('Arial', 11))
+		self.setFont(QFont('Noto San', 9))
 
 	def initAction(self):
 		self.cancalButton.clicked.connect(self.cancel)

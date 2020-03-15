@@ -22,7 +22,7 @@ class ShowerUi(QWidget):
 			self.deletion_count = 0
 		self.initUI()
 		self.initAction()
-		self.setFont(QFont('Arial', 11))
+		self.setFont(QFont('Noto San', 9))
 
 	def initUI(self):
 		self.infoLabel = QLabel('Status: empty')
