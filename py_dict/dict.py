@@ -35,7 +35,7 @@ class App(QMainWindow):
 		self.setupMenus()
 		self.initUI()
 		self.initAction()
-		self.setFont(QFont('Arial', 11))
+		self.setFont(QFont('Noto San', 9))
 		self.results = None
 		self.articles = {}
 
@@ -52,23 +52,23 @@ class App(QMainWindow):
 		self.wordList.clicked.connect(self.wordListClicked)
 		self.articleList.clicked.connect(self.articleListClicked)
 
+	def getWord(self):
+		return self.wordEdit.text().strip().lower()
+
 	def showWordDetail(self, word):
 		record = self.db_operator.select_word(word)
 		if record is None:
-			self.statusBar().showMessage('The word doesn\'t exist, reselect word list.')
+			self.statusBar().showMessage(
+				f'Chosen word ({word}) doesn\'t exist, re-generating word list.'
+			)
 			self.wordList.clear()
-			self.searchRecords(self.wordEdit.text().strip().lower())
+			self.searchRecords(self.getWord())
 			return
 		self.meaning.setText(record[2])
 		self.sound.setText(record[3])
 		self.exchange.setText(record[4])
 		usages = self.db_operator.select_usages(word)
-		all_usage = ''
-		for usage in usages:
-			if all_usage != '':
-				all_usage += '\n'
-			all_usage += usage[0]
-		self.usageEdit.setText(all_usage)
+		self.usageEdit.setText(combine_usage_str(usages))
 		res_articles = self.db_operator.select_article_for_word(word)
 		if res_articles is None:
 			res_articles = []
@@ -115,8 +115,7 @@ class App(QMainWindow):
 	def searchRecords(self, key=None):
 		self.clearUi()
 		if key in (None, False):
-			key = self.wordEdit.text().strip()
-		key = key.lower()
+			key = self.getWord()
 		if key == '':
 			self.results = self.db_operator.select_all_words()
 		else:

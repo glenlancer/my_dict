@@ -1,4 +1,5 @@
 -- Simplify password policy.
+-- These two seems not exsiting for newer version of mysql.
 set global validate_password_policy=0;
 set global validate_password_length=1;
 
