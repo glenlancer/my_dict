@@ -9,6 +9,7 @@ from PyQt5.QtGui import QFont
 
 from .db import DbOperator
 from .show import ShowerUi
+from .function import *
 
 class DeleterUi(QWidget):
 	def __init__(self, db_operator):

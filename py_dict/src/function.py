@@ -11,7 +11,7 @@ def is_a_word(word):
 
 def escape_double_quotes(content):
 	''' escape double quotes for mysql syntax '''
-	return content.replace('"', '\\"')
+	return content.replace('"', '\\\\"')
 
 def combine_usage_str(usages=None):
 	if usages is None:

@@ -38,7 +38,7 @@ class WordUi(QWidget):
 			self.infoLabel.setText('Need to type in a word.')
 			return False
 		if not is_a_word(word):
-			self.infoLable.setText(f'The word ({word}) is not valid.')
+			self.infoLabel.setText(f'The word ({word}) is not valid.')
 			return False
 		return True
 
@@ -124,7 +124,7 @@ class WordUi(QWidget):
 			)
 		return False
 
-	def process_update_word_check(self, record, meaning, pronunciation, exchange)
+	def process_update_word_check(self, record, meaning, pronunciation, exchange):
 		return meaning and pronunciation and \
 			(
 				record[2] != meaning or \

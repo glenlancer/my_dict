@@ -53,15 +53,15 @@ class DbOperator():
 		return True
 
 	def select_word(self, word):
-		sql = 'SELECT * FROM Words WHERE Word = "{word}"'
+		sql = f'SELECT * FROM Words WHERE Word = "{word}"'
 		return self.db_fetchone(sql)
 
 	def select_like_word(self, word):
-		sql = 'SELECT Word FROM Words WHERE Word LIKE "%{word}%"'
+		sql = f'SELECT Word FROM Words WHERE Word LIKE "%{word}%"'
 		return self.db_fetchall(sql)
 
 	def select_usages(self, word):
-		sql = 'SELECT `Usage` FROM `Usage` WHERE Word = "{word}"'
+		sql = f'SELECT `Usage` FROM `Usage` WHERE Word = "{word}"'
 		return self.db_fetchall(sql)
 
 	def select_article_for_word(self, word):
@@ -73,20 +73,20 @@ class DbOperator():
 		return self.db_fetchall(sql)
 
 	def select_article(self, title):
-		sql = f'SELECT * FROM Article WHERE title "{title}"'
+		sql = f'SELECT * FROM Article WHERE Title = "{title}"'
 		return self.db_fetchone(sql)
 
 	def select_like_article(self, title):
-		sql = 'SELECT Title FROM Article WHERE Title LIKE "%{title}%"'
+		sql = f'SELECT Title FROM Article WHERE Title LIKE "%{title}%"'
 		return self.db_fetchall(sql)
 
 	def select_all_articles(self):
 		sql = 'SELECT Title FROM Article'
-		return self.db_fetchall()	
+		return self.db_fetchall(sql)	
 
 	def select_all_articles_for_mapping(self):
 		sql = 'SELECT Title, Content FROM Article'
-		return self.db_fetchall()
+		return self.db_fetchall(sql)
 
 	def select_all_words(self):
 		sql = 'SELECT Word FROM Words'
