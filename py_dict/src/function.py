@@ -19,6 +19,6 @@ def combine_usage_str(usages=None):
     all_usage = ''
     for usage in usages:
         if all_usage != '':
-            all_usage += '\n'
+            all_usage += '\n\n'
         all_usage += usage[0]
     return all_usage

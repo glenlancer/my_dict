@@ -9,6 +9,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 
 from .db import DbOperator
+from .function import *
 
 class ShowerUi(QWidget):
     def __init__(self, db_operator=None, parent_win=None):
@@ -55,16 +56,13 @@ class ShowerUi(QWidget):
             self.webView.setHtml('<p>Content 404 :(</p>')
             self.setWindowTitle('The record is nil')
         elif self.type == 'show_word':
+            self.content["usage"] = self.content["usage"].replace('\n', '<br>')
             self.webView.setHtml(f'''
         <strong>{self.content["word"]}</strong>
         <p>
-            <strong>Meaning</strong>: {self.content["meaning"]}
-            <br>
-            <strong>Pronunciation<strong>: {self.content["sound"]}
-            <br>
-            <span>
-            Forms: {self.content["exchange"]}
-            </span>
+            {self.content["meaning"]}<br>
+            {self.content["sound"]}<br>
+            {self.content["exchange"]}
         </p>
         <p>
             <span>Usage:</span><br>
@@ -85,10 +83,13 @@ class ShowerUi(QWidget):
             self.deleteButton.clicked.connect(self.deleteRecord)
 
     def deleteRecord(self):
-        if self.type == 'show_word':
+        res = None
+        if self.type == 'show_word' and self.content:
             res = self.db_operator.delete_a_word(self.content['word'])
-        else:
-            res = self.db_operator.delete_a_article(self.content['title'])
+        elif self.content:
+            res = self.db_operator.delete_a_article(
+                escape_double_quotes(self.content['title'])
+            )
         self.db_operator.print_messages()
         if res:
             self.deletion_count += 1

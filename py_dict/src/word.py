@@ -89,8 +89,13 @@ class WordUi(QWidget):
             self.infoLabel.setText('Word doesn\'t exist, gave up insertion of usage.')
             return
         if usage:
-            usage = escape_double_quotes(usage)
-            self.db_operator.insert_usage(word, usage)
+            # A simple solution for now, just only insert the
+            # content of usage if existing usages are the same.
+            usages = self.db_operator.select_usages(word)
+            usages = map(lambda x: x[0], usages)
+            if usage not in usages:
+                usage = escape_double_quotes(usage)
+                self.db_operator.insert_usage(word, usage)
         self.db_operator.db_commit()
         self.db_operator.print_messages()
 
