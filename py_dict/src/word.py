@@ -50,10 +50,13 @@ class WordUi(QWidget):
         online_info = self.scraper.get_info_from_php(word)
         if online_info['mean']:
             self.meanEdit.setText(online_info['mean'])
+            self.meanEdit.setCursorPosition(0)
         if online_info['pron']:
             self.pronEdit.setText(online_info['pron'])
+            self.pronEdit.setCursorPosition(0)
         if online_info['exchange']:
             self.exchangeEdit.setText(online_info['exchange'])
+            self.exchangeEdit.setCursorPosition(0)
         if online_info['usage']:
             self.usageEdit.setPlainText(online_info['usage'])
         self.infoLabel.setText('Searching done...')

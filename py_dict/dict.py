@@ -67,8 +67,11 @@ class App(QMainWindow):
             self.searchRecords(self.getWord())
             return
         self.meaning.setText(record[2])
+        self.meaning.setCursorPosition(0)
         self.sound.setText(record[3])
+        self.sound.setCursorPosition(0)
         self.exchange.setText(record[4])
+        self.exchange.setCursorPosition(0)
         usages = self.db_operator.select_usages(word)
         self.usageEdit.setText(combine_usage_str(usages))
         res_articles = self.db_operator.select_article_for_word(word)
