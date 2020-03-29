@@ -30,6 +30,9 @@ class WordUi(QWidget):
         self.clearButton.clicked.connect(self.clear)
         self.onlineButton.clicked.connect(self.online)
 
+    def showEvent(self, event):
+        self.infoLabel.setText('Status: empty')
+
     def getWord(self):
         return self.wordEdit.text().strip().lower()
 

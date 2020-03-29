@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
     QPushButton, QLineEdit, QListWidget
 )
 from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtCore import Qt
 from src.word import WordUi
 from src.article import ArticleUi
 from src.mapping import MappingUi
@@ -177,28 +178,48 @@ class App(QMainWindow):
         self.statusBar().showMessage('Ready')
         self.show()
 
+    def show_word_ui(self):
+        self.word_ui.show()
+        self.word_ui.setFocus()
+        self.word_ui.activateWindow()
+    
+    def show_article_ui(self):
+        self.article_ui.show()
+        self.article_ui.setFocus()
+        self.article_ui.activateWindow()
+
+    def show_deleter_ui(self):
+        self.deleter_ui.show()
+        self.deleter_ui.setFocus()
+        self.deleter_ui.activateWindow()
+
+    def show_mapping_ui(self):
+        self.mapping_ui.show()
+        self.mapping_ui.setFocus()
+        self.mapping_ui.activateWindow()
+
     def setupMenus(self):
         menuBar = self.menuBar()
         appMenu = menuBar.addMenu('&App')
 
         addWordAction = QAction('&Record', self)
         addWordAction.setStatusTip('Add Word & Usage')
-        addWordAction.triggered.connect(self.word_ui.show)
+        addWordAction.triggered.connect(self.show_word_ui)
         appMenu.addAction(addWordAction)
 
         addArticleAction = QAction('&Article', self)
         addArticleAction.setStatusTip('Add Article')
-        addArticleAction.triggered.connect(self.article_ui.show)
+        addArticleAction.triggered.connect(self.show_article_ui)
         appMenu.addAction(addArticleAction)
 
         deleteAction = QAction('Delete &Records', self)
         deleteAction.setStatusTip('Delete Records')
-        deleteAction.triggered.connect(self.deleter_ui.show)
+        deleteAction.triggered.connect(self.show_deleter_ui)
         appMenu.addAction(deleteAction)
 
         matchAction = QAction('&Matchmaking', self)
         matchAction.setStatusTip('Mapping Words and Articles')
-        matchAction.triggered.connect(self.mapping_ui.show)
+        matchAction.triggered.connect(self.show_mapping_ui)
         appMenu.addAction(matchAction)
 
         exitAction = QAction('&Exit', self)
