@@ -227,6 +227,23 @@ class App(QMainWindow):
         exitAction.triggered.connect(qApp.quit)		
         appMenu.addAction(exitAction)
 
+        dbMenu = menuBar.addMenu('&Db Operations')
+        exportDbToFileAction = QAction('&Export', self)
+        exportDbToFileAction.setStatusTip('Export Db to File')
+        exportDbToFileAction.triggered.connect(self.export_db_to_file)
+        dbMenu.addAction(exportDbToFileAction)
+
+        importFileToDbAction = QAction('&Import', self)
+        importFileToDbAction.setStatusTip('Import File to Db')
+        importFileToDbAction.triggered.connect(self.import_file_to_db)
+        dbMenu.addAction(importFileToDbAction)
+
+    def export_db_to_file(self):
+        pass
+
+    def import_file_to_db(self):
+        pass
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = App()
