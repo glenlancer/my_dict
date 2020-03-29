@@ -88,14 +88,14 @@ class App(QMainWindow):
     def articleListClicked(self, index):
         i = index.row()
         item = self.articleList.item(i).text()
-        article_record = self.db_operator.select_article(item)
+        article_record = self.db_operator.select_article(escape_double_quotes(item))
         if article_record:
             content = {
                 'title': article_record[1],
                 'content': article_record[2]
             }
         else:
-            conent = {
+            content = {
                 'title': 'No record',
                 'content': 'There is no relevant article found.'
             }

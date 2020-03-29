@@ -8,6 +8,7 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 
 from .db import DbOperator
+from .function import *
 
 class MappingUi(QWidget):
     def __init__(self, db_operator):
@@ -53,7 +54,8 @@ class MappingUi(QWidget):
                 )
                 if res is None:
                     continue
-                self.db_operator.insert_reference(word[0], article[0])
+                self.db_operator.insert_reference(
+                    word[0], escape_double_quotes(article[0]))
                 self.count += 1
             index += 1
             self.make_progress(index)

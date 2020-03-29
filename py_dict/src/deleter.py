@@ -23,6 +23,9 @@ class DeleterUi(QWidget):
         self.results = None
         self.radioBtnWord.setChecked(True)
 
+    def closeEvent(self, event):
+        self.shower_ui.close()
+
     def searchRecords(self, key=None):
         self.resultList.clear()
         if key in (None, False):
@@ -98,6 +101,7 @@ class DeleterUi(QWidget):
     def resultListClicked(self, index):
         i = index.row()
         item = self.resultList.item(i).text()
+        item = escape_double_quotes(item)
         if self.deleteType == 'word':
             record = self.db_operator.select_word(item)
             usages = self.db_operator.select_usages(item)
