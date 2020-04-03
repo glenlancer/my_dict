@@ -12,7 +12,10 @@ class Scraper():
         return 'http://www.iciba.com/index.php?a=getWordMean&c=search&word={}'.format(self.word)
 
     def get_json_text(self):
-        return requests.get(self.get_php_request_url()).text
+        try:
+            return requests.get(self.get_php_request_url()).text
+        except Exception as e:
+            return dict()
 
     def get_html_text(self):
         return requests.get(self.get_request_url()).text

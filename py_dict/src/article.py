@@ -2,7 +2,8 @@
 
 import sys
 from PyQt5.QtWidgets import (
-    QWidget, QApplication, QMessageBox, QHBoxLayout, QVBoxLayout,
+    QWidget, QApplication, QMessageBox,
+    QHBoxLayout, QVBoxLayout,
     QPushButton, QLabel, QLineEdit, QTextEdit
 )
 from PyQt5.QtGui import QFont
@@ -92,7 +93,7 @@ class ArticleUi(QWidget):
         self.titleEdit = QLineEdit(self)
         self.titleEdit.setPlaceholderText('The title of the article')
         self.contentEdit = QTextEdit(self)
-        self.contentEdit.setPlaceholderText('Put the content of the artile here')
+        self.contentEdit.setPlaceholderText('Put the content of the article here')
         vbox_i.addWidget(titleLabel)
         vbox_i.addWidget(self.titleEdit)
         vbox_i.addWidget(contentLabel)

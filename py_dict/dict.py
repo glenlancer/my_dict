@@ -6,7 +6,9 @@ from PyQt5.QtWidgets import (
     QGridLayout, QHBoxLayout,
     QAction, qApp, QWidget,
     QLabel, QTextEdit,
-    QPushButton, QLineEdit, QListWidget
+    QPushButton, QLineEdit,
+    QListWidget, QFileDialog,
+    QMessageBox
 )
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import Qt
@@ -239,10 +241,66 @@ class App(QMainWindow):
         dbMenu.addAction(importFileToDbAction)
 
     def export_db_to_file(self):
-        pass
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            'Export Db to File',
+            './',
+            'Sql Files (*.sql)'
+        )
+        if not file_name:
+            return
+        res = self.db_operator.db_export_to_file(file_name)
+        if res:
+            QMessageBox.information(
+                self,
+                'Information',
+                f'Export Db to {file_name} failed, error code is {res}')
+        else:
+            QMessageBox.information(
+                self,
+                'Information',
+                f'Export Db to {file_name} succeeded.'
+            )
 
     def import_file_to_db(self):
-        pass
+        res = QMessageBox.warning(
+            self,
+            'Warning',
+            'This function probably shouln\'t be used!\n'
+            'To use this function, make sure of the following 3 points.\n'
+            '(1) The file used for importing must make sense and correct.\n'
+            '(2) This process will overwrite existing db, all current data WILL BE LOST!\n'
+            '(3) The implementation of this function is very simple, so try manually if failed.',
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
+        if res == QMessageBox.No:
+            return
+        file_name, _ = QFileDialog.getOpenFileName(
+            self,
+            'Select Db file',
+            './',
+            'Sql Files (*.sql)')
+        if not file_name:
+            return
+        res = self.db_operator.drop_all_tables()
+        if not res:
+            QMessageBox.information(
+                self,
+                'Information',
+                'Drop all tables failed'
+            )
+            return
+        res = self.db_operator.db_import_from_file(file_name)
+        if res:
+            QMessageBox.information(
+                self,
+                'Information',
+                f'Import {file_name} to Db failed, error code is {res}')
+        else:
+            QMessageBox.information(
+                self,
+                'Information',
+                f'Import {file_name} to Db succeeded.'
+            )
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

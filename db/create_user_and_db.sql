@@ -8,3 +8,7 @@ create user 'dictuser'@'localhost' identified by 'dictuser123';
 create database dict_db;
 grant all privileges on `dict_db`.* to 'dictuser'@'localhost' identified by 'dictuser123';
 flush privileges;
+
+-- This one is used for exporting db to file or file to db.
+-- But prefer to use mysqldump, since this one is harder to be configured.
+grant file on *.* to 'dictuser'@'localhost';

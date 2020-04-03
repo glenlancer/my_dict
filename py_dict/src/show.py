@@ -2,7 +2,9 @@
 
 import sys
 from PyQt5.QtWidgets import (
-    QWidget, QApplication, QHBoxLayout, QVBoxLayout, QLabel, QPushButton
+    QWidget, QApplication,
+    QHBoxLayout, QVBoxLayout,
+    QLabel, QPushButton
 )
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtGui import QFont

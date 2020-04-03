@@ -1,18 +1,31 @@
 #!/usr/bin/python3
 
+import os
 import pymysql
 
 class DbOperator():
+    __DB_USERNAME = 'dictuser'
+    __DB_PASSWORD = 'dictuser123'
+    __DB_DBNAME = 'dict_db'
+
     def __init__(self):
         self.conn = pymysql.connect(
             host='localhost',
-            user='dictuser',
-            password='dictuser123',
-            database='dict_db',
+            user=self.__DB_USERNAME,
+            password=self.__DB_PASSWORD,
+            database=self.__DB_DBNAME,
             charset='utf8'
         )
         self.cursor = self.conn.cursor()
         self.messages = []
+        # TODO Implement in memory data handling to avoid unnecessary
+        # Database accessing.
+        self.in_memory_data = {
+            'Words': {},
+            'Usage': {},
+            'Article': {},
+            'Reference': {}
+        }
 
     def db_close(self):
         self.cursor.close()
@@ -20,6 +33,12 @@ class DbOperator():
 
     def db_commit(self):
         self.conn.commit()
+
+    def db_export_to_file(self, file_name):
+        return os.system(f'mysqldump -u{self.__DB_USERNAME} -p{self.__DB_PASSWORD} {self.__DB_DBNAME} > {file_name}')
+
+    def db_import_from_file(self, file_name):
+        return os.system(f'mysql -u{self.__DB_USERNAME} -p{self.__DB_PASSWORD} {self.__DB_DBNAME} < {file_name}')
 
     def db_fetchone(self, sql):
         try:
@@ -135,32 +154,36 @@ class DbOperator():
         sql = f'INSERT INTO Reference (Word, Title) VALUES ("{word}", "{title}")'
         return self.db_execute(sql)
 
+    def drop_all_tables(self):
+        sqls = [
+            'DROP TABLE Reference',
+            'DROP TABLE `Usage`',
+            'DROP TABLE Article',
+            'DROP TABLE Words'
+        ]
+        return self.execute_all_sqls(sqls, False)
+
     def delete_a_word(self, word):
         sqls = [
             'DELETE FROM Reference WHERE Word="{}"'.format(word),
             'DELETE FROM `Usage` WHERE Word="{}"'.format(word),
             'DELETE FROM Words WHERE Word="{}"'.format(word)
         ]
-        try:
-            for sql in sqls:
-                self.cursor.execute(sql)
-            self.db_commit()
-        except Exception as e:
-            self.messages.append(
-                f'SQL failed: {sqls}, due to {e.args[-1]}'
-            )
-            return False
-        return True
+        return self.execute_all_sqls(sqls)
 
     def delete_a_article(self, title):
         sqls = [
             'DELETE FROM Reference WHERE Title="{}"'.format(title),
             'DELETE FROM Article WHERE Title="{}"'.format(title)
         ]
+        return self.execute_all_sqls(sqls)
+
+    def execute_all_sqls(self, sqls, need_commit=True):
         try:
             for sql in sqls:
                 self.cursor.execute(sql)
-            self.db_commit()
+            if need_commit:
+                self.db_commit()
         except Exception as e:
             self.messages.append(
                 f'SQL failed: {sqls}, due to {e.args[-1]}'

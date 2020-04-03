@@ -2,7 +2,9 @@
 
 import sys, re
 from PyQt5.QtWidgets import (
-    QWidget, QApplication, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QProgressBar
+    QWidget, QApplication,
+    QVBoxLayout, QHBoxLayout,
+    QPushButton, QLabel, QProgressBar
 )
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt

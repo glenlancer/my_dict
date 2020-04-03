@@ -2,8 +2,10 @@
 
 import sys
 from PyQt5.QtWidgets import (
-    QWidget, QApplication, QHBoxLayout, QVBoxLayout,
-    QRadioButton, QButtonGroup, QPushButton, QLineEdit, QLabel, QListWidget
+    QWidget, QApplication,
+    QHBoxLayout, QVBoxLayout,
+    QRadioButton, QButtonGroup, QPushButton,
+    QLineEdit, QLabel, QListWidget
 )
 from PyQt5.QtGui import QFont
 
