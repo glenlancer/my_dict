@@ -1,3 +1,6 @@
+-- Create the database
+create database if not exists dict_db;
+
 -- Switch to new database
 use dict_db;
 

@@ -30,18 +30,28 @@ class App(QMainWindow):
         self.top = 10
         self.width = 820
         self.height = 500
-        self.db_operator = DbOperator()
-        self.word_ui = WordUi(self.db_operator)
-        self.article_ui = ArticleUi(self.db_operator)
-        self.mapping_ui = MappingUi(self.db_operator)
-        self.deleter_ui = DeleterUi(self.db_operator)
-        self.shower_ui = ShowerUi()
         self.setupMenus()
         self.initUI()
         self.initAction()
         self.setFont(QFont('Noto San', 9))
         self.results = None
         self.articles = {}
+        self.db_operator = DbOperator()
+        self.word_ui = WordUi(self.db_operator)
+        self.article_ui = ArticleUi(self.db_operator)
+        self.mapping_ui = MappingUi(self.db_operator)
+        self.deleter_ui = DeleterUi(self.db_operator)
+        self.shower_ui = ShowerUi()
+        ret_code, ret_message = self.db_operator.try_db_connect()
+        if ret_code == 0:
+            return
+        elif ret_code == 2003:
+            self.handleMysqlDown(ret_message)
+        elif ret_code in (1044, 1049):
+            self.handleDbConnectionIssue(ret_code, ret_message)
+        elif ret_code == 1045:
+            self.handleUserNotExist(ret_message)
+        sys.exit(0)
 
     def closeEvent(self, event):
         self.word_ui.close()
@@ -176,7 +186,7 @@ class App(QMainWindow):
         widget.setLayout(main)
         self.setCentralWidget(widget)
         self.setWindowTitle(self.title)
-        self.setGeometry(self.left, self.top, self.width, self.height)		
+        self.setGeometry(self.left, self.top, self.width, self.height)
         self.statusBar().showMessage('Ready')
         self.show()
 
@@ -224,10 +234,10 @@ class App(QMainWindow):
         matchAction.triggered.connect(self.show_mapping_ui)
         appMenu.addAction(matchAction)
 
-        exitAction = QAction('&Exit', self)
-        exitAction.setStatusTip('Exit application')
-        exitAction.triggered.connect(qApp.quit)		
-        appMenu.addAction(exitAction)
+        self.exitAction = QAction('&Exit', self)
+        self.exitAction.setStatusTip('Exit application')
+        self.exitAction.triggered.connect(qApp.quit)
+        appMenu.addAction(self.exitAction)
 
         dbMenu = menuBar.addMenu('&Db Operations')
         exportDbToFileAction = QAction('&Export', self)
@@ -266,11 +276,11 @@ class App(QMainWindow):
         res = QMessageBox.warning(
             self,
             'Warning',
-            'This function probably shouln\'t be used!\n'
+            'This function probably shouldn\'t be used!\n'
             'To use this function, make sure of the following 3 points.\n'
             '(1) The file used for importing must make sense and correct.\n'
             '(2) This process will overwrite existing db, all current data WILL BE LOST!\n'
-            '(3) The implementation of this function is very simple, so try manually if failed.',
+            '(3) The implementation of this function is very simple, so try manually if fail.',
             QMessageBox.Yes | QMessageBox.No, QMessageBox.Yes)
         if res == QMessageBox.No:
             return
@@ -301,6 +311,39 @@ class App(QMainWindow):
                 'Information',
                 f'Import {file_name} to Db succeeded.'
             )
+
+    def handleMysqlDown(self, message):
+        QMessageBox.information(
+            self,
+            'Information',
+            'Error: 2003\n'
+            f'Message: {message}\n'
+            'This is possibly due to MySql service is not up or installed.\n'
+            'Please start or install Mysql service first and try again.')
+
+    def handleDbConnectionIssue(self, code, message):
+        res = QMessageBox.question(
+            self,
+            'Question',
+            f'Error: {code}\n'
+            f'Message: {message}\n'
+            'This is possibly due to db doesn\'t exist.\n'
+            'Try to create database (and tables) before exit?',
+            QMessageBox.Ok | QMessageBox.Cancel, QMessageBox.Ok)
+        if res == QMessageBox.Ok:
+            self.db_operator.db_create_database()
+
+    def handleUserNotExist(self, message):
+        QMessageBox.information(
+            self,
+            'Information',
+            'Error: 1045\n'
+            f'Message: {message}\n'
+            'This is possibly due to user doesn\'t exist for the database.\n'
+            'Please do something similar to below then try again.\n\n'
+            "> create user 'dictuser'@'localhost' identified by 'dictuser123';\n"
+            "> grant all privileges on `dict_db`.* to 'dictuser'@'localhost' identified by 'dictuser123';\n"
+            "> flush privileges;")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

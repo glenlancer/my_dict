@@ -9,14 +9,6 @@ class DbOperator():
     __DB_DBNAME = 'dict_db'
 
     def __init__(self):
-        self.conn = pymysql.connect(
-            host='localhost',
-            user=self.__DB_USERNAME,
-            password=self.__DB_PASSWORD,
-            database=self.__DB_DBNAME,
-            charset='utf8'
-        )
-        self.cursor = self.conn.cursor()
         self.messages = []
         # TODO Implement in memory data handling to avoid unnecessary
         # Database accessing.
@@ -27,9 +19,99 @@ class DbOperator():
             'Reference': {}
         }
 
+     def __del__(self):
+        self.db_close()
+
+    def try_db_connect(self):
+        try:
+            self.db_connect()
+        except Exception as e:
+            '''
+            Error code:
+            (1) 2003 - Can't connect to server, possibly due to MySql service is not up or installed.
+            (2) 1044 - Access denied, possibly due to db doesn't exist.
+            (3) 1045 - Access denied, possibly due to user doesn't exist.
+            (4) 1049 - Unknown database, possibly due to db doesn't exist.
+            '''
+            return e.args
+        return (0, 'Success')
+
+    def db_connect(self):
+        self.conn = pymysql.connect(
+            host='localhost',
+            user=self.__DB_USERNAME,
+            password=self.__DB_PASSWORD,
+            database=self.__DB_DBNAME,
+            charset='utf8'
+        )
+        self.cursor = self.conn.cursor()
+
+    def db_connect_with_no_specified_db(self):
+        self.conn = pymysql.connect(
+            host='localhost',
+            user=self.__DB_USERNAME,
+            password=self.__DB_PASSWORD,
+            charset='utf8')
+        self.cursor = self.conn.cursor()
+
+    def db_create_database(self):
+        try:
+            self.db_connect_with_no_specified_db()
+        except Exception as e:
+            os.system(f'cat {e.args[0]}:{e.args[1]} > dict_error.log')
+            return
+        self.db_create_db_and_tables()
+
+    def db_create_db_and_tables(self):
+        sqls = [
+            'create database if not exists dict_db',
+            'use dict_db',
+            '''
+                create table Words (
+                    WID           serial,
+                    Word          varchar(50) not null unique,
+                    Meaning       varchar(250) not null,
+                    Pronunciation varchar(50),
+                    Exchange      varchar(100),
+                    `date`        datetime not null,
+                    primary key (Word)
+                ) ENGINE=InnoDB Default Charset=utf8
+            ''',
+            '''
+                create table `Usage` (
+                    UID     serial,
+                    Word    varchar(50) not null,
+                    `Usage` text not null,
+                    primary key (UID),
+                    foreign key (Word) references Words(Word)
+                ) ENGINE=InnoDB Default Charset=utf8
+            ''',
+            '''
+                create table Article (
+                    AID     serial,
+                    Title   varchar(100) not null unique,
+                    Content text not null,
+                    primary key (AID)
+                ) ENGINE=InnoDB Default Charset=utf8
+            ''',
+            '''
+                create table Reference (
+                    RID serial,
+                    Word varchar(50) not null,
+                    Title varchar(100) not null,
+                    primary key (RID),
+                    foreign key (Word) references Words(Word),
+                    foreign key (Title) references Article(Title)
+                ) ENGINE=InnoDB Default Charset=utf8
+            '''
+        ]
+        self.execute_all_sqls(sqls, False)
+
     def db_close(self):
-        self.cursor.close()
-        self.conn.close()
+        if hasattr(self, 'cursor'):
+            self.cursor.close()
+        if hasattr(self, 'conn'):
+            self.conn.close()
 
     def db_commit(self):
         self.conn.commit()
