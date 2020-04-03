@@ -19,7 +19,7 @@ class DbOperator():
             'Reference': {}
         }
 
-     def __del__(self):
+    def __del__(self):
         self.db_close()
 
     def try_db_connect(self):
