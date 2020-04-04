@@ -99,25 +99,20 @@ class WordUi(QWidget):
             # A simple solution for now, just only insert the
             # content of usage if existing usages are the same.
             usages = self.db_operator.select_usages(word)
-            usages = map(lambda x: x[0], usages)
             if usage not in usages:
-                usage = escape_double_quotes(usage)
                 self.db_operator.insert_usage(word, usage)
         self.db_operator.db_commit()
         self.db_operator.print_messages()
 
     def process_word(self, word, meaning, pronunciation, exchange):
         record = self.db_operator.select_word(word)
-        esed_meaning = escape_double_quotes(meaning)
-        esed_pronunciation = escape_double_quotes(pronunciation)
-        esed_exchange = escape_double_quotes(exchange)
         if record is None:
             return self.process_insert_word(
-                word, esed_meaning, esed_pronunciation, esed_exchange
+                word, meaning, pronunciation, exchange
             )
         elif self.process_update_word_check(record, meaning, pronunciation, exchange):
             self.process_update_word(
-                word, esed_meaning, esed_pronunciation, esed_exchange
+                word, meaning, pronunciation, exchange
             )
         else:
             self.infoLabel.setText('Word not updated, info not enough or the same.')		
@@ -139,9 +134,9 @@ class WordUi(QWidget):
     def process_update_word_check(self, record, meaning, pronunciation, exchange):
         return meaning and pronunciation and \
             (
-                record[2] != meaning or \
-                record[3] != pronunciation or \
-                record[4] != exchange
+                record[0] != meaning or \
+                record[1] != pronunciation or \
+                record[2] != exchange
             )
 
     def process_update_word(self, word, meaning, pronunciation, exchange):

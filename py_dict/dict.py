@@ -36,7 +36,6 @@ class App(QMainWindow):
         self.initAction()
         self.setFont(QFont('Noto San', 9))
         self.results = None
-        self.articles = {}
         self.db_operator = DbOperator()
         self.word_ui = WordUi(self.db_operator, self.icon)
         self.article_ui = ArticleUi(self.db_operator, self.icon)
@@ -80,21 +79,19 @@ class App(QMainWindow):
             self.wordList.clear()
             self.searchRecords(self.getWord())
             return
-        self.meaning.setText(record[2])
+        self.meaning.setText(record[0])
         self.meaning.setCursorPosition(0)
-        self.sound.setText(record[3])
+        self.sound.setText(record[1])
         self.sound.setCursorPosition(0)
-        self.exchange.setText(record[4])
+        self.exchange.setText(record[2])
         self.exchange.setCursorPosition(0)
         usages = self.db_operator.select_usages(word)
         self.usageEdit.setText(combine_usage_str(usages))
         res_articles = self.db_operator.select_article_for_word(word)
         if res_articles is None:
             res_articles = []
-        for article in res_articles:
-            self.articles[article[0]] = article[1]
-        for key in self.articles.keys():
-            self.articleList.addItem(key)
+        for title in res_articles:
+            self.articleList.addItem(title[0])
 
     def wordListClicked(self, index):
         self.clearRightPanel()
@@ -105,11 +102,11 @@ class App(QMainWindow):
     def articleListClicked(self, index):
         i = index.row()
         item = self.articleList.item(i).text()
-        article_record = self.db_operator.select_article(escape_double_quotes(item))
+        article_record = self.db_operator.select_article(item)
         if article_record:
             content = {
-                'title': article_record[1],
-                'content': article_record[2]
+                'title': article_record[0],
+                'content': article_record[1]
             }
         else:
             content = {
@@ -129,17 +126,18 @@ class App(QMainWindow):
         self.exchange.setText('')
         self.usageEdit.setPlainText('')
         self.articleList.clear()
-        self.articles.clear()
 
     def searchRecords(self, key=None):
         self.clearUi()
         if key in (None, False):
             key = self.getWord()
+        if not is_a_word(key):
+            self.statusBar().showMessage(f'The word ({key}) is not valid.')
+            return
         if key == '':
             self.results = self.db_operator.select_all_words()
         else:
             self.results = self.db_operator.select_like_word(key)
-        self.results = list(self.results)
         self.results = list(map(lambda x: x[0], self.results))
         self.wordList.addItems(self.results)
 

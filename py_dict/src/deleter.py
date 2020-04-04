@@ -41,7 +41,7 @@ class DeleterUi(QWidget):
                 self.results = self.db_operator.select_like_word(key)
         else:
             if key == '':
-                self.results = self.db_operator.select_all_articles()
+                self.results = self.db_operator.select_all_article_titles()
             else:
                 self.results = self.db_operator.select_like_article(key)
         self.results = list(self.results)
@@ -105,7 +105,6 @@ class DeleterUi(QWidget):
     def resultListClicked(self, index):
         i = index.row()
         item = self.resultList.item(i).text()
-        item = escape_double_quotes(item)
         if self.deleteType == 'word':
             record = self.db_operator.select_word(item)
             usages = self.db_operator.select_usages(item)
@@ -113,10 +112,10 @@ class DeleterUi(QWidget):
                 content = None
             else:
                 content = {
-                    'word': record[1],
-                    'meaning': record[2],
-                    'sound': record[3],
-                    'exchange': record[4],
+                    'word': item,
+                    'meaning': record[0],
+                    'sound': record[1],
+                    'exchange': record[2],
                     'usage': combine_usage_str(usages)
                 }
             self.shower_ui.initWebView('show_word', content)
@@ -126,8 +125,8 @@ class DeleterUi(QWidget):
                 content = None
             else:
                 content = {
-                    'title': record[1],
-                    'content': record[2]
+                    'title': record[0],
+                    'content': record[1]
                 }
             self.shower_ui.initWebView('show_article', content)
         self.shower_ui.show()

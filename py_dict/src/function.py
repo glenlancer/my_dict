@@ -2,7 +2,7 @@
 
 import re
 
-DEBUG_FLAG = False
+DEBUG_FLAG = True
 
 def is_a_word(word):
     ''' check if given word is valid '''
@@ -20,5 +20,5 @@ def combine_usage_str(usages=None):
     for usage in usages:
         if all_usage != '':
             all_usage += '\n\n'
-        all_usage += usage[0]
+        all_usage += usage
     return all_usage

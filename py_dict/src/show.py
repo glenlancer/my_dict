@@ -91,9 +91,7 @@ class ShowerUi(QWidget):
         if self.type == 'show_word' and self.content:
             res = self.db_operator.delete_a_word(self.content['word'])
         elif self.content:
-            res = self.db_operator.delete_a_article(
-                escape_double_quotes(self.content['title'])
-            )
+            res = self.db_operator.delete_a_article(self.content['title'])
         self.db_operator.print_messages()
         if res:
             self.deletion_count += 1

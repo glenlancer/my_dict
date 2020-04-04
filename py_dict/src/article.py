@@ -41,14 +41,11 @@ class ArticleUi(QWidget):
             print('content')
             print(content)
 
-        esed_title = escape_double_quotes(title)
-        esed_content = escape_double_quotes(content)
-
-        record = self.db_operator.select_article(esed_title)
+        record = self.db_operator.select_article(title)
         if record is None:
-            self.process_insert_article(esed_title, esed_content)
-        elif record[2] != content:
-            self.process_update_article(esed_title, esed_content)
+            self.process_insert_article(title, content)
+        elif record[1] != content:
+            self.process_update_article(title, content)
         else:
             self.infoLabel.setText('Article is unchanged.')
         self.db_operator.db_commit()
