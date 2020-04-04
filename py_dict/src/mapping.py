@@ -31,10 +31,10 @@ class MappingUi(QWidget):
     def create(self):
         all_words = self.db_operator.select_all_words()
         all_articles = self.db_operator.select_all_articles()
-        if all_words is None:
+        if not all_words:
             self.infoLabel.setText('There are no word found.')
             return
-        if all_articles is None:
+        if not all_articles:
             self.infoLabel.setText('There are no article found.')
             return
         self.total_count = len(all_words)
@@ -51,13 +51,13 @@ class MappingUi(QWidget):
         for word in all_words:
             for article in all_articles:
                 res = re.search(
-                    word[0],
+                    word,
                     article[1],
                     flags=re.IGNORECASE
                 )
                 if res is None:
                     continue
-                self.db_operator.insert_reference(word[0], article[0])
+                self.db_operator.insert_reference(word, article[0])
                 self.count += 1
             index += 1
             self.make_progress(index)

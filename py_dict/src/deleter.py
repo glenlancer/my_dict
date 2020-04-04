@@ -44,8 +44,6 @@ class DeleterUi(QWidget):
                 self.results = self.db_operator.select_all_article_titles()
             else:
                 self.results = self.db_operator.select_like_article(key)
-        self.results = list(self.results)
-        self.results = list(map(lambda x: x[0], self.results))
         self.resultList.addItems(self.results)
 
     def initAction(self):

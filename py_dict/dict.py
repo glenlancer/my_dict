@@ -138,7 +138,6 @@ class App(QMainWindow):
             self.results = self.db_operator.select_all_words()
         else:
             self.results = self.db_operator.select_like_word(key)
-        self.results = list(map(lambda x: x[0], self.results))
         self.wordList.addItems(self.results)
 
     def initUI(self):

@@ -45,6 +45,8 @@ class ArticleUi(QWidget):
         if record is None:
             self.process_insert_article(title, content)
         elif record[1] != content:
+            print('old', record[1])
+            print('new', content)
             self.process_update_article(title, content)
         else:
             self.infoLabel.setText('Article is unchanged.')

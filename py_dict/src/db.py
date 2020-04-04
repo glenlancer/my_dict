@@ -4,6 +4,7 @@ import os
 import pymysql
 from cacheout import LRUCache
 from .function import DEBUG_FLAG
+from .function import escape_double_quotes
 
 class DbOperator():
     __DB_USERNAME = 'dictuser'
@@ -136,7 +137,10 @@ class DbOperator():
         try:
             self.cursor.execute(sql)
             # When result is empty, fetchone() returns None.
-            return self.cursor.fetchone()
+            res = self.cursor.fetchone()
+            if res is None:
+                return None
+            return list(res)
         except Exception as e:
             self.messages.append(
                 f'SQL failed: {sql}, due to {e.args[-1]}'
@@ -146,12 +150,12 @@ class DbOperator():
     def db_fetchall(self, sql):
         try:
             self.cursor.execute(sql)
-            return self.cursor.fetchall()
+            return list(map(lambda x: list(x), self.cursor.fetchall()))
         except Exception as e:
             self.messages.append(
                 f'SQL failed: {sql}, due to {e.args[-1]}'
             )
-            return tuple()
+            return list()
 
     def db_execute(self, sql):
         try:
@@ -161,210 +165,6 @@ class DbOperator():
                 f'SQL failed: {sql}, due to {e.args[-1]}'
             )
             return False
-        return True
-
-    def select_word(self, word):
-        record = self.words_detail_cache.get(word)
-        if record:
-            return record
-        sql = f'SELECT Meaning, Pronunciation, Exchange FROM Words WHERE Word = "{word}"'
-        record = self.db_fetchone(sql)
-        if record:
-            self.words_detail_cache.add(word, record)
-        return record
-
-    def select_like_word(self, word):
-        records = self.words_name_cache.get(word)
-        if records:
-            return records
-        sql = f'SELECT Word FROM Words WHERE Word LIKE "%{word}%"'
-        records = self.db_fetchall(sql)
-        if records:
-            self.words_name_cache.add(word, records)
-        return records
-
-    def select_all_words(self):
-        records = self.words_name_cache.get(self.__ALL_WORDS_KEY)
-        if records:
-            return records
-        sql = 'SELECT Word FROM Words'
-        records = self.db_fetchall(sql)
-        if records:
-            self.words_name_cache.add(self.__ALL_WORDS_KEY, records)
-        return records
-
-    def select_usages(self, word):
-        records = self.usage_cache.get(word)
-        if records:
-            return records
-        sql = f'SELECT `Usage` FROM `Usage` WHERE Word = "{word}"'
-        records = self.db_fetchall(sql)
-        if records:
-            records = map(lambda x: x[0], records)
-            self.usage_cache.add(word, records)
-        return records
-
-    def select_article_for_word(self, word):
-        records = self.reference_cache.get(word)
-        if not records:
-            return records
-        sql = ''.join([
-            'SELECT Article.Title from Article ',
-            'JOIN Reference ON Reference.Title = Article.Title ',
-            f'WHERE Word = "{word}"'
-        ])
-        records = self.db_fetchall(sql)
-        if records:
-            self.reference_cache.add(word, records)
-        return records
-
-    def select_article(self, title):
-        record = self.article_detail_cache.get(title)
-        if record:
-            return record
-        esd_title = escape_double_quotes(title)
-        sql = f'SELECT Title, Content FROM Article WHERE Title = "{esd_title}"'
-        record = self.db_fetchone(sql)
-        if record:
-            self.article_detail_cache.add(title, record)
-        return record
-
-    def select_like_article(self, title):
-        records = self.article_name_cache.get(title)
-        if records:
-            return records
-        esd_title = escape_double_quotes(title)
-        sql = f'SELECT Title FROM Article WHERE Title LIKE "%{esd_title}%"'
-        records = self.db_fetchall(sql)
-        if records:
-            self.article_name_cache.add(title, records)
-        return records
-
-    def select_all_article_titles(self):
-        records = self.article_name_cache.get(self.__ALL_ARTICLE_KEY)
-        if records:
-            return records
-        sql = 'SELECT Title FROM Article'
-        records = self.db_fetchall(sql)
-        if records:
-            self.article_name_cache.add(self.__ALL_ARTICLE_KEY, records)
-        return records
-
-    def select_all_articles(self):
-        sql = 'SELECT Title, Content FROM Article'
-        records = self.db_fetchall(sql)
-        self.article_detail_cache.clear()
-        for record in records:
-            self.article_detail_cache.add(record[0], record[1])
-        return records
-
-    def insert_article(self, title, content):
-        esd_title = escape_double_quotes(title)
-        esd_content = escape_double_quotes(content)
-        sql = f'INSERT INTO Article (Title, Content) VALUES ("{esd_title}", "{esd_content}")'
-        res = self.db_execute(sql)
-        if not res:
-            return False
-        self.article_detail_cache.set(title, content)
-        self.article_name_cache.clear()
-        return True
-
-    def insert_word(self, word, meaning, pron, exchange):
-        esd_meaning = escape_double_quotes(meaning)
-        esd_pronunciation = escape_double_quotes(pron)
-        esd_exchange = escape_double_quotes(exchange)
-        sql = ''.join([
-            'INSERT INTO Words\n',
-            '(Word, Meaning, Pronunciation, Exchange, `date`)\n',
-            'VALUES\n',
-            f'("{word}", "{esd_meaning}", "{esd_pronunciation}", "{esd_exchange}", CURDATE())'
-        ])
-        res = self.db_execute(sql)
-        if not res:
-            return False
-        self.words_detail_cache.add(word, (meaning, pron, exchange))
-        return True
-
-    def update_article(self, title, content):
-        sql = ''.join([
-            f'UPDATE Article SET Content="{content}"\n',
-            f'WHERE Title="{title}"'
-        ])
-        return self.db_execute(sql)
-
-    def update_word(self, word, meaning, pron, exchange):
-        esd_meaning = escape_double_quotes(meaning)
-        esd_pronunciation = escape_double_quotes(pron)
-        esd_exchange = escape_double_quotes(exchange)
-        sql = ''.join([
-            f'UPDATE Words SET Meaning="{esd_meaning}", Pronunciation="{esd_pronunciation}", Exchange="{esd_exchange}", `date`=CURDATE()\n',
-            f'WHERE Word="{word}"'
-        ])
-        res = self.db_execute(sql)
-        if not res:
-            return False
-        self.words_detail_cache.set(word, (meaning, pron, exchange))
-        return True
-
-    def insert_usage(self, word, usage):
-        esd_usage = escape_double_quotes(usage)
-        sql = f'INSERT INTO `Usage` (Word, `Usage`) VALUES ("{word}", "{esd_usage}")'
-        res = self.db_execute(sql)
-        if not res:
-            return False
-        usages = self.usage_cache.get(word)
-        if usages is None:
-            usages = []
-        usages.append(usage)
-        self.usage_cache.add(word, usages)
-        return True
-
-    def insert_article(self, title, content):
-        sql = f'INSERT INTO Article (Title, Content) VALUES ("{title}", "{content}")'
-        return self.db_execute(sql)
-
-    def truncate_reference(self):
-        sql = 'TRUNCATE TABLE Reference'
-        return self.db_execute(sql)
-
-    def insert_reference(self, word, title):
-        sql = f'INSERT INTO Reference (Word, Title) VALUES ("{word}", "{title}")'
-        return self.db_execute(sql)
-
-    def drop_all_tables(self):
-        sqls = [
-            'DROP TABLE Reference',
-            'DROP TABLE `Usage`',
-            'DROP TABLE Article',
-            'DROP TABLE Words'
-        ]
-        return self.execute_all_sqls(sqls, False)
-
-    def delete_a_word(self, word):
-        sqls = [
-            'DELETE FROM Reference WHERE Word="{}"'.format(word),
-            'DELETE FROM `Usage` WHERE Word="{}"'.format(word),
-            'DELETE FROM Words WHERE Word="{}"'.format(word)
-        ]
-        res = self.execute_all_sqls(sqls)
-        if not res:
-            return False
-        self.words_detail_cache.delete(word)
-        self.usage_cache.delete(word)
-        # TODO
-        return True
-
-    def delete_a_article(self, title):
-        esd_title = escape_double_quotes(title)
-        sqls = [
-            'DELETE FROM Reference WHERE Title="{}"'.format(esd_title),
-            'DELETE FROM Article WHERE Title="{}"'.format(esd_title)
-        ]
-        res = self.execute_all_sqls(sqls)
-        if not res:
-            return False
-        self.article_detail_cache.delete(title)
-        # TODO
         return True
 
     def execute_all_sqls(self, sqls, need_commit=True):
@@ -379,6 +179,279 @@ class DbOperator():
             )
             return False
         return True
+
+    # checked
+    def select_word(self, word):
+        record = self.words_detail_cache.get(word)
+        print('cache record', record)
+        if record:
+            return record
+        sql = f'SELECT Meaning, Pronunciation, Exchange FROM Words WHERE Word = "{word}"'
+        record = self.db_fetchone(sql)
+        print('db record', record)
+        if record:
+            self.words_detail_cache.add(word, record)
+        return record
+
+    # checked
+    def select_like_word(self, word):
+        records = self.words_name_cache.get(word)
+        if records is not None:
+            return records
+        sql = f'SELECT Word FROM Words WHERE Word LIKE "%{word}%"'
+        records = self.db_fetchall(sql)
+        records = list(map(lambda x: x[0], records))
+        self.words_name_cache.add(word, records)
+        return records
+
+    # checked
+    def select_all_words(self):
+        records = self.words_name_cache.get(self.__ALL_WORDS_KEY)
+        print('cache records 1', records)
+        if records is not None:
+            return records
+        sql = 'SELECT Word FROM Words'
+        records = self.db_fetchall(sql)
+        records = list(map(lambda x: x[0], records))
+        print('db records 2', records)
+        self.words_name_cache.add(self.__ALL_WORDS_KEY, records)
+        return records
+
+    # checked
+    def select_usages(self, word):
+        records = self.usage_cache.get(word)
+        if records is not None:
+            return records
+        sql = f'SELECT `Usage` FROM `Usage` WHERE Word = "{word}"'
+        records = self.db_fetchall(sql)
+        records = list(map(lambda x: x[0], records))
+        self.usage_cache.add(word, records)
+        return records
+
+    # checked
+    def select_article_for_word(self, word):
+        records = self.reference_cache.get(word)
+        if records is not None:
+            return records
+        sql = ''.join([
+            'SELECT Article.Title from Article ',
+            'JOIN Reference ON Reference.Title = Article.Title ',
+            f'WHERE Word = "{word}"'
+        ])
+        records = self.db_fetchall(sql)
+        records = list(map(lambda x: x[0], records))
+        self.reference_cache.add(word, records)
+        return records
+
+    # checked
+    def select_article(self, title):
+        record = self.article_detail_cache.get(title)
+        if record:
+            return record
+        esd_title = escape_double_quotes(title)
+        sql = f'SELECT Content FROM Article WHERE Title = "{esd_title}"'
+        record = self.db_fetchone(sql)
+        if record:
+            self.article_detail_cache.add(title, record[0])
+        return record
+
+    # checked
+    def select_like_article(self, title):
+        records = self.article_name_cache.get(title)
+        if records is not None:
+            return records
+        esd_title = escape_double_quotes(title)
+        sql = f'SELECT Title FROM Article WHERE Title LIKE "%{esd_title}%"'
+        records = self.db_fetchall(sql)
+        records = list(map(lambda x: x[0], records))
+        self.article_name_cache.add(title, records)
+        return records
+
+    # checked
+    def select_all_article_titles(self):
+        records = self.article_name_cache.get(self.__ALL_ARTICLE_KEY)
+        if records is not None:
+            return records
+        sql = 'SELECT Title FROM Article'
+        records = self.db_fetchall(sql)
+        records = list(map(lambda x: x[0], records))
+        self.article_name_cache.add(self.__ALL_ARTICLE_KEY, records)
+        return records
+
+    # checked
+    def select_all_articles(self):
+        sql = 'SELECT Title, Content FROM Article'
+        records = self.db_fetchall(sql)
+        self.article_detail_cache.clear()
+        count = 0
+        for record in records:
+            if count < self.__CACHE_MAXSIZE:
+                self.article_detail_cache.add(record[0], record[1])
+                count += 1
+            else:
+                break
+        return records
+
+    # checked
+    def insert_word(self, word, meaning, pron, exchange):
+        esd_meaning = escape_double_quotes(meaning)
+        esd_pronunciation = escape_double_quotes(pron)
+        esd_exchange = escape_double_quotes(exchange)
+        sql = ''.join([
+            'INSERT INTO Words\n',
+            '(Word, Meaning, Pronunciation, Exchange, `date`)\n',
+            'VALUES\n',
+            f'("{word}", "{esd_meaning}", "{esd_pronunciation}", "{esd_exchange}", CURDATE())'
+        ])
+        res = self.db_execute(sql)
+        if not res:
+            return False
+        self.words_detail_cache.add(word, [meaning, pron, exchange])
+        self.words_name_cache.clear()
+        return True
+
+    # checked
+    def update_word(self, word, meaning, pron, exchange):
+        esd_meaning = escape_double_quotes(meaning)
+        esd_pronunciation = escape_double_quotes(pron)
+        esd_exchange = escape_double_quotes(exchange)
+        sql = ''.join([
+            f'UPDATE Words SET Meaning="{esd_meaning}", Pronunciation="{esd_pronunciation}", Exchange="{esd_exchange}", `date`=CURDATE()\n',
+            f'WHERE Word="{word}"'
+        ])
+        res = self.db_execute(sql)
+        if not res:
+            return False
+        self.words_detail_cache.set(word, [meaning, pron, exchange])
+        return True
+
+    # checked
+    def insert_article(self, title, content):
+        esd_title = escape_double_quotes(title)
+        esd_content = escape_double_quotes(content)
+        sql = f'INSERT INTO Article (Title, Content) VALUES ("{esd_title}", "{esd_content}")'
+        res = self.db_execute(sql)
+        if not res:
+            return False
+        self.article_detail_cache.add(title, content)
+        self.article_name_cache.clear()
+        return True
+
+    # checked
+    def update_article(self, title, content):
+        esd_title = escape_double_quotes(title)
+        esd_content = escape_double_quotes(content)
+        sql = ''.join([
+            f'UPDATE Article SET Content="{esd_content}"\n',
+            f'WHERE Title="{esd_title}"'
+        ])
+        res = self.db_execute(sql)
+        if not res:
+            return False
+        self.article_detail_cache.set(title, content)
+        return True
+
+    # checked
+    def insert_usage(self, word, usage):
+        esd_usage = escape_double_quotes(usage)
+        sql = f'INSERT INTO `Usage` (Word, `Usage`) VALUES ("{word}", "{esd_usage}")'
+        res = self.db_execute(sql)
+        if not res:
+            return False
+        usages = self.usage_cache.get(word)
+        if usages is None:
+            usages = []
+        usages.append(usage)
+        self.usage_cache.set(word, usages)
+        return True
+
+    # checked
+    def insert_article(self, title, content):
+        esd_title = escape_double_quotes(title)
+        esd_content = escape_double_quotes(content)
+        sql = f'INSERT INTO Article (Title, Content) VALUES ("{esd_title}", "{esd_content}")'
+        res = self.db_execute(sql)
+        if not res:
+            return False
+        self.article_detail_cache.add(title, content)
+        self.article_name_cache.clear()
+        return True
+
+    # checked
+    def truncate_reference(self):
+        sql = 'TRUNCATE TABLE Reference'
+        res = self.db_execute(sql)
+        if not res:
+            return False
+        self.reference_cache.clear()
+        return True
+
+    # checked
+    def insert_reference(self, word, title):
+        esd_title = escape_double_quotes(title)
+        sql = f'INSERT INTO Reference (Word, Title) VALUES ("{word}", "{title}")'
+        res = self.db_execute(sql)
+        if not res:
+            return False
+        res = self.reference_cache.get(word)
+        if res is None:
+            self.reference_cache.add(word, [title])
+        else:
+            self.reference_cache.set(word, res.append(title))
+        return True
+
+    def drop_all_tables(self):
+        sqls = [
+            'DROP TABLE Reference',
+            'DROP TABLE `Usage`',
+            'DROP TABLE Article',
+            'DROP TABLE Words'
+        ]
+        self.clear_all_caches()
+        return self.execute_all_sqls(sqls, False)
+
+    # checked
+    def delete_a_word(self, word):
+        sqls = [
+            'DELETE FROM Reference WHERE Word="{}"'.format(word),
+            'DELETE FROM `Usage` WHERE Word="{}"'.format(word),
+            'DELETE FROM Words WHERE Word="{}"'.format(word)
+        ]
+        res = self.execute_all_sqls(sqls)
+        if not res:
+            return False
+        self.words_detail_cache.delete(word)
+        self.usage_cache.delete(word)
+        self.reference_cache.delete(word)
+        # TODO Do we need to touch words_name_cache?
+        return True
+
+    # checked
+    def delete_a_article(self, title):
+        esd_title = escape_double_quotes(title)
+        sqls = [
+            'DELETE FROM Reference WHERE Title="{}"'.format(esd_title),
+            'DELETE FROM Article WHERE Title="{}"'.format(esd_title)
+        ]
+        res = self.execute_all_sqls(sqls)
+        if not res:
+            return False
+        self.article_detail_cache.delete(title)
+        for key in self.reference_cache.keys():
+            value = self.reference_cache.get(key)
+            if title in value:
+                value.remove(title)
+            self.reference_cache.set(key, value)
+        # TODO Do we need to touch article_name_cache?
+        return True
+
+    def clear_all_caches(self):
+        self.words_detail_cache.clear()
+        self.words_name_cache.clear()
+        self.usage_cache.clear()
+        self.article_detail_cache.clear()
+        self.article_name_cache.clear()
+        self.reference_cache.clear()
 
     def print_messages(self):
         if DEBUG_FLAG:

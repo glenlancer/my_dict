@@ -98,7 +98,7 @@ class ShowerUi(QWidget):
             self.infoLabel.setText('Recrod has been deleted.')
         else:
             self.infoLabel.setText('There is an error happened during deletion.')
-# A commit test
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     db_operator = DbOperator()
