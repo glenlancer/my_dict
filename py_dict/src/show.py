@@ -7,19 +7,20 @@ from PyQt5.QtWidgets import (
     QLabel, QPushButton
 )
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import Qt
 
 from .db import DbOperator
 from .function import *
 
 class ShowerUi(QWidget):
-    def __init__(self, db_operator=None, parent_win=None):
+    def __init__(self, db_operator=None, icon=None, parent_win=None):
         super().__init__()
         self.type = 'show_word'
         self.content = None
         self.parent_win = parent_win
         self.db_operator = db_operator
+        self.icon = icon
         if self.db_operator:
             self.setWindowModality(Qt.WindowModal)
             self.deletion_count = 0
@@ -46,6 +47,7 @@ class ShowerUi(QWidget):
 
         self.setLayout(vbox)
         self.setGeometry(300, 300, 400, 400)
+        self.setWindowIcon(self.icon)
 
     def closeEvent(self, event):
         if self.parent_win and self.deletion_count > 0:

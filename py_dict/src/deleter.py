@@ -7,18 +7,19 @@ from PyQt5.QtWidgets import (
     QRadioButton, QButtonGroup, QPushButton,
     QLineEdit, QLabel, QListWidget
 )
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QIcon, QFont
 
 from .db import DbOperator
 from .show import ShowerUi
 from .function import *
 
 class DeleterUi(QWidget):
-    def __init__(self, db_operator):
+    def __init__(self, db_operator, icon):
         super().__init__()
         self.deleteType = 'word'
         self.db_operator = db_operator
-        self.shower_ui = ShowerUi(self.db_operator, self)
+        self.icon = icon
+        self.shower_ui = ShowerUi(self.db_operator, icon, self)
         self.initUI()
         self.initAction()
         self.setFont(QFont('Noto San', 9))
@@ -87,6 +88,7 @@ class DeleterUi(QWidget):
         self.setLayout(vbox)
         self.setGeometry(300, 300, 400, 600)
         self.setWindowTitle('Delete Records')
+        self.setWindowIcon(self.icon)
 
     def btnState(self, button):
         if button.text() == 'Word' and self.deleteType != 'word':

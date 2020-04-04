@@ -6,16 +6,17 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QVBoxLayout,
     QPushButton, QLabel, QLineEdit, QTextEdit
 )
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QIcon, QFont
 from .function import *
 from .db import DbOperator
 
 # https://pythonprogramminglanguage.com/pyqt-line-edit/
 
 class ArticleUi(QWidget):
-    def __init__(self, db_operator):
+    def __init__(self, db_operator, icon):
         super().__init__()
         self.db_operator = db_operator
+        self.icon = icon
         self.initUI()
         self.initAction()
         self.setFont(QFont('Noto San', 9))
@@ -108,6 +109,7 @@ class ArticleUi(QWidget):
 
         self.setGeometry(300, 300, 500, 600)
         self.setWindowTitle('Article Management')
+        self.setWindowIcon(self.icon)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

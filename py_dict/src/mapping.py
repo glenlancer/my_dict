@@ -6,16 +6,17 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QProgressBar
 )
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import Qt
 
 from .db import DbOperator
 from .function import *
 
 class MappingUi(QWidget):
-    def __init__(self, db_operator):
+    def __init__(self, db_operator, icon):
         super().__init__()
         self.db_operator = db_operator
+        self.icon = icon
         self.initUI()
         self.initAction()
         self.setFont(QFont('Noto San', 9))
@@ -99,6 +100,7 @@ class MappingUi(QWidget):
 
         self.setGeometry(300, 300, 450, 60)
         self.setWindowTitle('Mapping')
+        self.setWindowIcon(self.icon)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

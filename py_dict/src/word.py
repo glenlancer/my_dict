@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
     QLabel, QLineEdit, QTextEdit,
     QApplication, QMessageBox
 )
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QIcon, QFont
 
 from .db import DbOperator
 from .scraper import Scraper
@@ -16,9 +16,10 @@ from .function import *
 # https://pythonprogramminglanguage.com/pyqt-line-edit/
 
 class WordUi(QWidget):
-    def __init__(self, db_operator):
+    def __init__(self, db_operator, icon):
         super().__init__()
         self.db_operator = db_operator
+        self.icon = icon
         self.scraper = Scraper()
         self.initUI()
         self.initAction()
@@ -211,6 +212,7 @@ class WordUi(QWidget):
 
         self.setGeometry(300, 300, 500, 600)
         self.setWindowTitle('Record Management')
+        self.setWindowIcon(self.icon)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

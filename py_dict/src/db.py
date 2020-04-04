@@ -2,6 +2,7 @@
 
 import os
 import pymysql
+from .function import DEBUG_FLAG
 
 class DbOperator():
     __DB_USERNAME = 'dictuser'
@@ -274,11 +275,12 @@ class DbOperator():
         return True
 
     def print_messages(self):
-        print('--- All messages ---')
-        for message in self.messages:
-            print(message)
-        self.messages = []
-        print('--- End of all messages ---')
+        if DEBUG_FLAG:
+            print('--- All messages ---')
+            for message in self.messages:
+                print(message)
+            self.messages = []
+            print('--- End of all messages ---')
 
 def db_access_test(db_operator):
     pass

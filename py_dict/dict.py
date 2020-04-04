@@ -26,6 +26,7 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.title = "Glen's Personal Dictionary"
+        self.icon = QIcon('images/logo.ico')
         self.left = 10
         self.top = 10
         self.width = 820
@@ -37,11 +38,11 @@ class App(QMainWindow):
         self.results = None
         self.articles = {}
         self.db_operator = DbOperator()
-        self.word_ui = WordUi(self.db_operator)
-        self.article_ui = ArticleUi(self.db_operator)
-        self.mapping_ui = MappingUi(self.db_operator)
-        self.deleter_ui = DeleterUi(self.db_operator)
-        self.shower_ui = ShowerUi()
+        self.word_ui = WordUi(self.db_operator, self.icon)
+        self.article_ui = ArticleUi(self.db_operator, self.icon)
+        self.mapping_ui = MappingUi(self.db_operator, self.icon)
+        self.deleter_ui = DeleterUi(self.db_operator, self.icon)
+        self.shower_ui = ShowerUi(None, self.icon)
         ret_code, ret_message = self.db_operator.try_db_connect()
         if ret_code == 0:
             return
@@ -187,6 +188,7 @@ class App(QMainWindow):
         self.setCentralWidget(widget)
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.setWindowIcon(self.icon)
         self.statusBar().showMessage('Ready')
         self.show()
 
