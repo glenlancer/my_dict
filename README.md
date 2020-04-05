@@ -1,5 +1,8 @@
 # my_dict
+
 A dictionary program to store all the new words I encountered.
+
+![my_dict](resources/logo.png "Glen's Dictionary")
 
 # How to release
 Currently, I use _PyInstaller_ to deply single file program for **my_dict**.
@@ -31,4 +34,5 @@ wheel          0.34.2
 ```
 
 Use following command to deploy a single file executable.
-`pyinstaller -F dict.py`
+
+**`pyinstaller -F dict.py`**

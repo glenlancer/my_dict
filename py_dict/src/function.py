@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 
 import re
+from PyQt5.QtGui import QIcon, QFont
 
 DEBUG_FLAG = False
+GLOBAL_FONT = QFont('Monaco', 10)
 
 def is_a_word(word):
     ''' check if given word is valid '''

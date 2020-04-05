@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
     QLabel, QPushButton
 )
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
 from .db import DbOperator
@@ -26,7 +26,7 @@ class ShowerUi(QWidget):
             self.deletion_used = False
         self.initUI()
         self.initAction()
-        self.setFont(QFont('Noto San', 9))
+        self.setFont(GLOBAL_FONT)
 
     def initUI(self):
         self.infoLabel = QLabel('Status: empty')

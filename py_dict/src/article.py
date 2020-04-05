@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QVBoxLayout,
     QPushButton, QLabel, QLineEdit, QTextEdit
 )
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 from .function import *
 from .db import DbOperator
 
@@ -19,7 +19,7 @@ class ArticleUi(QWidget):
         self.icon = icon
         self.initUI()
         self.initAction()
-        self.setFont(QFont('Noto San', 9))
+        self.setFont(GLOBAL_FONT)
 
     def initAction(self):
         self.cancalButton.clicked.connect(self.cancel)

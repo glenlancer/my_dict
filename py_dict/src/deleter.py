@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
     QRadioButton, QButtonGroup, QPushButton,
     QLineEdit, QLabel, QListWidget
 )
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 
 from .db import DbOperator
 from .show import ShowerUi
@@ -22,7 +22,7 @@ class DeleterUi(QWidget):
         self.shower_ui = ShowerUi(self.db_operator, icon, self)
         self.initUI()
         self.initAction()
-        self.setFont(QFont('Noto San', 9))
+        self.setFont(GLOBAL_FONT)
         self.results = None
         self.radioBtnWord.setChecked(True)
 

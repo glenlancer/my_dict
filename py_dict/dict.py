@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (
     QListWidget, QFileDialog,
     QMessageBox
 )
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 from src.word import WordUi
 from src.article import ArticleUi
@@ -27,6 +27,7 @@ Road Map:
 (1) Use qtawesome
 (2) Analysing cacheout
 (3) Implement some function to export Db to csv, pdf, etc.
+(4) The messages show in each window need to be improved.
 '''
 
 class App(QMainWindow):
@@ -41,7 +42,7 @@ class App(QMainWindow):
         self.setupMenus()
         self.initUI()
         self.initAction()
-        self.setFont(QFont('Noto San', 9))
+        self.setFont(GLOBAL_FONT)
         self.results = None
         self.db_operator = DbOperator()
         self.word_ui = WordUi(self.db_operator, self.icon)

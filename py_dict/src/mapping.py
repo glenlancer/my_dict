@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QProgressBar
 )
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import Qt
 
 from .db import DbOperator
@@ -19,7 +19,7 @@ class MappingUi(QWidget):
         self.icon = icon
         self.initUI()
         self.initAction()
-        self.setFont(QFont('Noto San', 9))
+        self.setFont(GLOBAL_FONT)
 
     def closeEvent(self, event):
         self.progressBar.setValue(0)

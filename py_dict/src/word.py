@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
     QLabel, QLineEdit, QTextEdit,
     QApplication, QMessageBox
 )
-from PyQt5.QtGui import QIcon, QFont
+from PyQt5.QtGui import QIcon
 
 from .db import DbOperator
 from .scraper import Scraper
@@ -23,7 +23,7 @@ class WordUi(QWidget):
         self.scraper = Scraper()
         self.initUI()
         self.initAction()
-        self.setFont(QFont('Noto San', 9))
+        self.setFont(GLOBAL_FONT)
 
     def initAction(self):
         self.cancalButton.clicked.connect(self.cancel)
