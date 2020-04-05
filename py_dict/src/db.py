@@ -180,7 +180,6 @@ class DbOperator():
             return False
         return True
 
-    # checked
     def select_word(self, word):
         record = self.words_detail_cache.get(word)
         if record:
@@ -191,7 +190,6 @@ class DbOperator():
             self.words_detail_cache.add(word, record)
         return record
 
-    # checked
     def select_like_word(self, word, clear_cache=False):
         if clear_cache:
             self.words_name_cache.delete(word)
@@ -205,7 +203,6 @@ class DbOperator():
         self.words_name_cache.add(word, records)
         return records
 
-    # checked
     def select_all_words(self, clear_cache=False):
         if clear_cache:
             self.words_name_cache.delete(self.__ALL_WORDS_KEY)
@@ -219,7 +216,6 @@ class DbOperator():
         self.words_name_cache.add(self.__ALL_WORDS_KEY, records)
         return records
 
-    # checked
     def select_usages(self, word):
         records = self.usage_cache.get(word)
         if records is not None:
@@ -230,7 +226,6 @@ class DbOperator():
         self.usage_cache.add(word, records)
         return records
 
-    # checked
     def select_article_for_word(self, word):
         records = self.reference_cache.get(word)
         if records is not None:
@@ -245,7 +240,6 @@ class DbOperator():
         self.reference_cache.add(word, records)
         return records
 
-    # checked
     def select_article(self, title):
         record = self.article_detail_cache.get(title)
         if record:
@@ -257,7 +251,6 @@ class DbOperator():
             self.article_detail_cache.add(title, record[0])
         return record if record is None else record[0]
 
-    # checked
     def select_like_article(self, title, clear_cache=False):
         if clear_cache:
             self.article_name_cache.delete(title)
@@ -272,7 +265,6 @@ class DbOperator():
         self.article_name_cache.add(title, records)
         return records
 
-    # checked
     def select_all_article_titles(self, clear_cache=False):
         if clear_cache:
             self.article_name_cache.delete(self.__ALL_ARTICLE_KEY)
@@ -286,7 +278,6 @@ class DbOperator():
         self.article_name_cache.add(self.__ALL_ARTICLE_KEY, records)
         return records
 
-    # checked
     def select_all_articles(self):
         sql = 'SELECT Title, Content FROM Article'
         records = self.db_fetchall(sql)
@@ -300,7 +291,6 @@ class DbOperator():
                 break
         return records
 
-    # checked
     def insert_word(self, word, meaning, pron, exchange):
         esd_meaning = escape_double_quotes(meaning)
         esd_pronunciation = escape_double_quotes(pron)
@@ -318,7 +308,6 @@ class DbOperator():
         self.words_name_cache.clear()
         return True
 
-    # checked
     def update_word(self, word, meaning, pron, exchange):
         esd_meaning = escape_double_quotes(meaning)
         esd_pronunciation = escape_double_quotes(pron)
@@ -333,7 +322,6 @@ class DbOperator():
         self.words_detail_cache.set(word, [meaning, pron, exchange])
         return True
 
-    # checked
     def insert_article(self, title, content):
         esd_title = escape_double_quotes(title)
         esd_content = escape_double_quotes(content)
@@ -345,7 +333,6 @@ class DbOperator():
         self.article_name_cache.clear()
         return True
 
-    # checked
     def update_article(self, title, content):
         esd_title = escape_double_quotes(title)
         esd_content = escape_double_quotes(content)
@@ -359,7 +346,6 @@ class DbOperator():
         self.article_detail_cache.set(title, content)
         return True
 
-    # checked
     def insert_usage(self, word, usage):
         esd_usage = escape_double_quotes(usage)
         sql = f'INSERT INTO `Usage` (Word, `Usage`) VALUES ("{word}", "{esd_usage}")'
@@ -373,7 +359,6 @@ class DbOperator():
         self.usage_cache.set(word, usages)
         return True
 
-    # checked
     def insert_article(self, title, content):
         esd_title = escape_double_quotes(title)
         esd_content = escape_double_quotes(content)
@@ -385,7 +370,6 @@ class DbOperator():
         self.article_name_cache.clear()
         return True
 
-    # checked
     def truncate_reference(self):
         sql = 'TRUNCATE TABLE Reference'
         res = self.db_execute(sql)
@@ -394,7 +378,6 @@ class DbOperator():
         self.reference_cache.clear()
         return True
 
-    # checked
     def insert_reference(self, word, title):
         esd_title = escape_double_quotes(title)
         sql = f'INSERT INTO Reference (Word, Title) VALUES ("{word}", "{esd_title}")'
@@ -418,7 +401,6 @@ class DbOperator():
         self.clear_all_caches()
         return self.execute_all_sqls(sqls, False)
 
-    # checked
     def delete_a_word(self, word):
         sqls = [
             'DELETE FROM Reference WHERE Word="{}"'.format(word),
@@ -432,9 +414,9 @@ class DbOperator():
         self.usage_cache.delete(word)
         self.reference_cache.delete(word)
         # TODO Do we need to touch words_name_cache?
+        # Seems not needed, since used a clear_cache parameter.
         return True
 
-    # checked
     def delete_a_article(self, title):
         esd_title = escape_double_quotes(title)
         sqls = [
@@ -451,6 +433,7 @@ class DbOperator():
                 value.remove(title)
             self.reference_cache.set(key, value)
         # TODO Do we need to touch article_name_cache?
+        # Seems not needed, since used a clear_cache parameter.
         return True
 
     def clear_all_caches(self):
