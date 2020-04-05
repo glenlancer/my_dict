@@ -22,6 +22,13 @@ from src.db import DbOperator
 
 # https://pythonspot.com/pyqt5-horizontal-layout/
 
+'''
+Road Map:
+(1) Use qtawesome
+(2) Analysing cacheout
+(3) Implement some function to export Db to csv, pdf, etc.
+'''
+
 class App(QMainWindow):
     def __init__(self):
         super().__init__()

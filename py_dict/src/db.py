@@ -10,7 +10,7 @@ class DbOperator():
     __DB_USERNAME = 'dictuser'
     __DB_PASSWORD = 'dictuser123'
     __DB_DBNAME = 'dict_db'
-    __CACHE_MAXSIZE = 1
+    __CACHE_MAXSIZE = 512
 
     # Use extra spaces, since no ordinary key allows this.
     __ALL_WORDS_KEY = ' ALL_WORDS '
