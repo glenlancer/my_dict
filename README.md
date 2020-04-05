@@ -36,3 +36,7 @@ wheel          0.34.2
 Use following command to deploy a single file executable.
 
 **`pyinstaller -F dict.py`**
+
+
+Use following command to generate `images.py`.
+**`pyrcc5 -o images.py images.qrc`**

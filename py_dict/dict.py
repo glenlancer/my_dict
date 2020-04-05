@@ -19,6 +19,7 @@ from src.deleter import DeleterUi
 from src.show import ShowerUi
 from src.function import *
 from src.db import DbOperator
+import images
 
 # https://pythonspot.com/pyqt5-horizontal-layout/
 
@@ -34,7 +35,7 @@ class App(QMainWindow):
     def __init__(self):
         super().__init__()
         self.title = "Glen's Personal Dictionary"
-        self.icon = QIcon('images/logo.ico')
+        self.icon = QIcon(':/images/logo.ico')
         self.left = 10
         self.top = 10
         self.width = 820
