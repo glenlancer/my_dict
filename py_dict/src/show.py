@@ -23,7 +23,7 @@ class ShowerUi(QWidget):
         self.icon = icon
         if self.db_operator:
             self.setWindowModality(Qt.WindowModal)
-            self.deletion_count = 0
+            self.deletion_used = False
         self.initUI()
         self.initAction()
         self.setFont(QFont('Noto San', 9))
@@ -46,11 +46,12 @@ class ShowerUi(QWidget):
             vbox.addLayout(hbox)
 
         self.setLayout(vbox)
-        self.setGeometry(300, 300, 400, 400)
+        self.setGeometry(300, 300, 900, 400)
         self.setWindowIcon(self.icon)
 
     def closeEvent(self, event):
-        if self.parent_win and self.deletion_count > 0:
+        if self.parent_win and self.deletion_used:
+            self.deletion_used = False
             self.parent_win.clearResultList()
 
     def initWebView(self, show_type, content):
@@ -94,7 +95,7 @@ class ShowerUi(QWidget):
             res = self.db_operator.delete_a_article(self.content['title'])
         self.db_operator.print_messages()
         if res:
-            self.deletion_count += 1
+            self.deletion_used = True
             self.infoLabel.setText('Recrod has been deleted.')
         else:
             self.infoLabel.setText('There is an error happened during deletion.')

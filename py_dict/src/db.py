@@ -10,7 +10,7 @@ class DbOperator():
     __DB_USERNAME = 'dictuser'
     __DB_PASSWORD = 'dictuser123'
     __DB_DBNAME = 'dict_db'
-    __CACHE_MAXSIZE = 512
+    __CACHE_MAXSIZE = 1
 
     # Use extra spaces, since no ordinary key allows this.
     __ALL_WORDS_KEY = ' ALL_WORDS '
@@ -183,21 +183,22 @@ class DbOperator():
     # checked
     def select_word(self, word):
         record = self.words_detail_cache.get(word)
-        print('cache record', record)
         if record:
             return record
         sql = f'SELECT Meaning, Pronunciation, Exchange FROM Words WHERE Word = "{word}"'
         record = self.db_fetchone(sql)
-        print('db record', record)
         if record:
             self.words_detail_cache.add(word, record)
         return record
 
     # checked
-    def select_like_word(self, word):
-        records = self.words_name_cache.get(word)
-        if records is not None:
-            return records
+    def select_like_word(self, word, clear_cache=False):
+        if clear_cache:
+            self.words_name_cache.delete(word)
+        else:
+            records = self.words_name_cache.get(word)
+            if records is not None:
+                return records
         sql = f'SELECT Word FROM Words WHERE Word LIKE "%{word}%"'
         records = self.db_fetchall(sql)
         records = list(map(lambda x: x[0], records))
@@ -205,15 +206,16 @@ class DbOperator():
         return records
 
     # checked
-    def select_all_words(self):
-        records = self.words_name_cache.get(self.__ALL_WORDS_KEY)
-        print('cache records 1', records)
-        if records is not None:
-            return records
+    def select_all_words(self, clear_cache=False):
+        if clear_cache:
+            self.words_name_cache.delete(self.__ALL_WORDS_KEY)
+        else:
+            records = self.words_name_cache.get(self.__ALL_WORDS_KEY)
+            if records is not None:
+                return records
         sql = 'SELECT Word FROM Words'
         records = self.db_fetchall(sql)
         records = list(map(lambda x: x[0], records))
-        print('db records 2', records)
         self.words_name_cache.add(self.__ALL_WORDS_KEY, records)
         return records
 
@@ -253,13 +255,16 @@ class DbOperator():
         record = self.db_fetchone(sql)
         if record:
             self.article_detail_cache.add(title, record[0])
-        return record
+        return record if record is None else record[0]
 
     # checked
-    def select_like_article(self, title):
-        records = self.article_name_cache.get(title)
-        if records is not None:
-            return records
+    def select_like_article(self, title, clear_cache=False):
+        if clear_cache:
+            self.article_name_cache.delete(title)
+        else:
+            records = self.article_name_cache.get(title)
+            if records is not None:
+                return records
         esd_title = escape_double_quotes(title)
         sql = f'SELECT Title FROM Article WHERE Title LIKE "%{esd_title}%"'
         records = self.db_fetchall(sql)
@@ -268,10 +273,13 @@ class DbOperator():
         return records
 
     # checked
-    def select_all_article_titles(self):
-        records = self.article_name_cache.get(self.__ALL_ARTICLE_KEY)
-        if records is not None:
-            return records
+    def select_all_article_titles(self, clear_cache=False):
+        if clear_cache:
+            self.article_name_cache.delete(self.__ALL_ARTICLE_KEY)
+        else:
+            records = self.article_name_cache.get(self.__ALL_ARTICLE_KEY)
+            if records is not None:
+                return records
         sql = 'SELECT Title FROM Article'
         records = self.db_fetchall(sql)
         records = list(map(lambda x: x[0], records))
@@ -389,7 +397,7 @@ class DbOperator():
     # checked
     def insert_reference(self, word, title):
         esd_title = escape_double_quotes(title)
-        sql = f'INSERT INTO Reference (Word, Title) VALUES ("{word}", "{title}")'
+        sql = f'INSERT INTO Reference (Word, Title) VALUES ("{word}", "{esd_title}")'
         res = self.db_execute(sql)
         if not res:
             return False

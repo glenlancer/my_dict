@@ -2,7 +2,7 @@
 
 import re
 
-DEBUG_FLAG = True
+DEBUG_FLAG = False
 
 def is_a_word(word):
     ''' check if given word is valid '''

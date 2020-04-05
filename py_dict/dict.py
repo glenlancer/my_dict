@@ -77,7 +77,7 @@ class App(QMainWindow):
                 f'Chosen word ({word}) doesn\'t exist, re-generating word list.'
             )
             self.wordList.clear()
-            self.searchRecords(self.getWord())
+            self.searchRecords(self.getWord(), clear_cache=True)
             return
         self.meaning.setText(record[0])
         self.meaning.setCursorPosition(0)
@@ -91,7 +91,7 @@ class App(QMainWindow):
         if res_articles is None:
             res_articles = []
         for title in res_articles:
-            self.articleList.addItem(title[0])
+            self.articleList.addItem(title)
 
     def wordListClicked(self, index):
         self.clearRightPanel()
@@ -102,11 +102,11 @@ class App(QMainWindow):
     def articleListClicked(self, index):
         i = index.row()
         item = self.articleList.item(i).text()
-        article_record = self.db_operator.select_article(item)
-        if article_record:
+        article_content = self.db_operator.select_article(item)
+        if article_content:
             content = {
-                'title': article_record[0],
-                'content': article_record[1]
+                'title': item,
+                'content': article_content
             }
         else:
             content = {
@@ -115,6 +115,8 @@ class App(QMainWindow):
             }
         self.shower_ui.initWebView('show_article', content)
         self.shower_ui.show()
+        self.shower_ui.setFocus()
+        self.shower_ui.activateWindow()
 
     def clearUi(self):
         self.wordList.clear()
@@ -127,7 +129,7 @@ class App(QMainWindow):
         self.usageEdit.setPlainText('')
         self.articleList.clear()
 
-    def searchRecords(self, key=None):
+    def searchRecords(self, key=None, clear_cache=False):
         self.clearUi()
         if key in (None, False):
             key = self.getWord()
@@ -135,9 +137,9 @@ class App(QMainWindow):
             self.statusBar().showMessage(f'The word ({key}) is not valid.')
             return
         if key == '':
-            self.results = self.db_operator.select_all_words()
+            self.results = self.db_operator.select_all_words(clear_cache)
         else:
-            self.results = self.db_operator.select_like_word(key)
+            self.results = self.db_operator.select_like_word(key, clear_cache)
         self.wordList.addItems(self.results)
 
     def initUI(self):

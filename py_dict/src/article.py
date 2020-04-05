@@ -44,8 +44,8 @@ class ArticleUi(QWidget):
         record = self.db_operator.select_article(title)
         if record is None:
             self.process_insert_article(title, content)
-        elif record[1] != content:
-            print('old', record[1])
+        elif record != content:
+            print('old', record)
             print('new', content)
             self.process_update_article(title, content)
         else:

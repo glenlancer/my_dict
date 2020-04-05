@@ -29,21 +29,21 @@ class DeleterUi(QWidget):
     def closeEvent(self, event):
         self.shower_ui.close()
 
-    def searchRecords(self, key=None):
+    def searchRecords(self, key=None, clear_cache=False):
         self.resultList.clear()
         if key in (None, False):
             key = self.searchText.text().strip()
-        key = key.lower()
+        self.key = key.lower()
         if self.deleteType == 'word':
-            if key == '':
-                self.results = self.db_operator.select_all_words()
+            if self.key == '':
+                self.results = self.db_operator.select_all_words(clear_cache)
             else:
-                self.results = self.db_operator.select_like_word(key)
+                self.results = self.db_operator.select_like_word(self.key, clear_cache)
         else:
-            if key == '':
-                self.results = self.db_operator.select_all_article_titles()
+            if self.key == '':
+                self.results = self.db_operator.select_all_article_titles(clear_cache)
             else:
-                self.results = self.db_operator.select_like_article(key)
+                self.results = self.db_operator.select_like_article(self.key, clear_cache)
         self.resultList.addItems(self.results)
 
     def initAction(self):
@@ -123,11 +123,15 @@ class DeleterUi(QWidget):
                 content = None
             else:
                 content = {
-                    'title': record[0],
-                    'content': record[1]
+                    'title': item,
+                    'content': record
                 }
             self.shower_ui.initWebView('show_article', content)
+        if content is None:
+            self.searchRecords(self.key, clear_cache=True)
         self.shower_ui.show()
+        self.shower_ui.setFocus()
+        self.shower_ui.activateWindow()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
