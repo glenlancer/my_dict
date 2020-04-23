@@ -49,16 +49,10 @@ class Scraper():
             return None
         exchange = json_response['baesInfo']['exchange']
         exchange_str = ''
-        if exchange['word_pl'] not in ([], ['']):
-            exchange_str += 'pl:{}'.format(exchange['word_pl'][0])
-        if exchange['word_third'] not in ([], ['']):
-            exchange_str += ' third:{}'.format(exchange['word_third'][0])
-        if exchange['word_past'] not in ([], ['']):
-            exchange_str += ' past:{}'.format(exchange['word_past'][0])
-        if exchange['word_done'] not in ([], ['']):
-            exchange_str += ' done:{}'.format(exchange['word_done'][0])
-        if exchange['word_ing'] not in ([], ['']):
-            exchange_str += ' ing:{}'.format(exchange['word_ing'][0])
+        for key, value in exchange.items():
+            if value not in ([], ['']):
+                value_str = ','.join(value)
+                exchange_str += f" {key.lstrip('word_')}:{value_str}"
         return exchange_str.strip()
 
     def get_meaning_json(self, json_response):
