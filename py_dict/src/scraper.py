@@ -15,7 +15,7 @@ class Scraper():
         try:
             return requests.get(self.get_php_request_url()).text
         except Exception as e:
-            return dict()
+            return ''
 
     def get_html_text(self):
         return requests.get(self.get_request_url()).text
