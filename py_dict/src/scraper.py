@@ -23,7 +23,11 @@ class Scraper():
     def get_info_from_php(self, word):
         self.word = word
         html = self.get_json_text()
-        response = json.loads(html)
+        try:
+            response = json.loads(html)
+        except json.decoder.JSONDecodeError as e:
+            print('A JSONDecodeError has happened', e.args[-1])
+            response = {}
         return {
             'pron': self.get_pronunciation_json(response),
             'mean': self.get_meaning_json(response),
